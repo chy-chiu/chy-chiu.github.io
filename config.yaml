@@ -1,0 +1,39 @@
+site:
+  title: "Your Name"
+  description: "Researcher, Writer, Thinker"
+  base_url: "https://yourusername.github.io"
+  author: "Your Name"
+
+nav:
+  - label: "About"
+    url: "/"
+  - label: "Research"
+    url: "/research/"
+  - label: "Writing"
+    url: "/writing/"
+  - label: "Notes"
+    url: "/notes/"
+
+style:
+  # Fonts (loaded from Google Fonts)
+  font_body: "IBM Plex Sans"
+  font_mono: "IBM Plex Mono"
+  font_heading: "IBM Plex Sans"
+
+  # Light mode colors
+  color_bg: "#ffffff"
+  color_text: "#1a1a1a"
+  color_text_muted: "#666666"
+  color_accent: "#0066cc"
+  color_border: "#e0e0e0"
+  color_code_bg: "#f5f5f5"
+
+  # Dark mode colors
+  color_bg_dark: "#1a1a1a"
+  color_text_dark: "#e0e0e0"
+  color_text_muted_dark: "#999999"
+  color_accent_dark: "#66b3ff"
+  color_border_dark: "#333333"
+  color_code_bg_dark: "#2d2d2d"
+
+math: true  # Whether to load MathJax for mathematical notation

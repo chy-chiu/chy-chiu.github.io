@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  {% include "partials/head.html" %}
+</head>
+<body>
+  {% include "partials/nav.html" %}
+
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/footer.html" %}
+
+  {% if config.math %}
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  {% endif %}
+
+  <script src="/static/js/theme.js"></script>
+</body>
+</html>

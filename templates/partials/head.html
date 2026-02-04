@@ -1,0 +1,23 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{% if page %}{{ page.title }} | {% endif %}{{ config.site.title }}</title>
+<meta name="description" content="{% if page and page.subtitle %}{{ page.subtitle }}{% else %}{{ config.site.description }}{% endif %}">
+<meta name="author" content="{{ config.site.author }}">
+
+<!-- Open Graph tags -->
+<meta property="og:title" content="{% if page %}{{ page.title }}{% else %}{{ config.site.title }}{% endif %}">
+<meta property="og:description" content="{% if page and page.subtitle %}{{ page.subtitle }}{% else %}{{ config.site.description }}{% endif %}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ config.site.base_url }}{{ current_url }}">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ config.site.base_url }}{{ current_url }}">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Stylesheet -->
+<link rel="stylesheet" href="/static/css/style.css">

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="tag-index">
+  <header class="section-header">
+    <h1>Tags</h1>
+  </header>
+
+  <ul class="tag-cloud">
+    {% for tag, posts in tags.items() | sort %}
+    <li>
+      <a href="/tags/{{ tag | slugify }}/" class="tag">
+        {{ tag }} <span class="tag-count">({{ posts | length }})</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

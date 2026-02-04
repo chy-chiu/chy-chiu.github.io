@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="post">
+  <header class="post-header">
+    <h1 class="post-title">{{ post.title }}</h1>
+    {% if post.subtitle %}
+    <p class="post-subtitle">{{ post.subtitle }}</p>
+    {% endif %}
+    <div class="post-meta">
+      <time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%B %d, %Y') }}</time>
+      {% if post.tags %}
+      <span class="post-tags">
+        {% for tag in post.tags %}
+        <a href="/tags/{{ tag | slugify }}/" class="tag">{{ tag }}</a>
+        {% endfor %}
+      </span>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if post.toc and toc_html %}
+  {{ toc_html | safe }}
+  {% endif %}
+
+  <div class="post-content prose">
+    {{ post.html_content | safe }}
+  </div>
+
+  {% if post.bibliography_html %}
+  {{ post.bibliography_html | safe }}
+  {% endif %}
+</article>
+{% endblock %}

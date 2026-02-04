@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="page research">
+  <header class="page-header">
+    <h1>{{ page.title }}</h1>
+  </header>
+
+  <div class="page-content prose">
+    {{ page.html_content | safe }}
+  </div>
+
+  {% if projects %}
+  <section class="projects-section">
+    <h2>Projects</h2>
+    <div class="projects-grid">
+      {% for project in projects %}
+      {% include "partials/project_card.html" %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if publications %}
+  <section class="publications-section">
+    <h2>Publications</h2>
+    {% set pubs_by_year = {} %}
+    {% for pub in publications %}
+      {% if pub.year not in pubs_by_year %}
+        {% set _ = pubs_by_year.update({pub.year: []}) %}
+      {% endif %}
+      {% set _ = pubs_by_year[pub.year].append(pub) %}
+    {% endfor %}
+
+    {% for year in pubs_by_year.keys() | sort(reverse=true) %}
+    <div class="pub-year-group">
+      <h3 class="pub-year">{{ year }}</h3>
+      <ul class="pub-list">
+        {% for pub in pubs_by_year[year] %}
+        {% include "partials/publication.html" %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

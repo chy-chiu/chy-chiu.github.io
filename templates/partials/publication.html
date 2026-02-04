@@ -1,0 +1,11 @@
+<li class="publication">
+  <span class="pub-authors">{{ pub.authors | join(', ') }}</span>.
+  "<span class="pub-title">{{ pub.title }}</span>."
+  <em class="pub-venue">{{ pub.venue }}</em>, {{ pub.year }}.
+  {% if pub.url or pub.code %}
+  <span class="pub-links">
+    {% if pub.url %}<a href="{{ pub.url }}">[Paper]</a>{% endif %}
+    {% if pub.code %}<a href="{{ pub.code }}">[Code]</a>{% endif %}
+  </span>
+  {% endif %}
+</li>

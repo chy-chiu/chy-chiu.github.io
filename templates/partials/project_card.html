@@ -1,0 +1,18 @@
+<article class="project-card">
+  {% if project.image %}
+  <div class="project-image">
+    <img src="/assets/images/{{ project.image }}" alt="{{ project.title }}" loading="lazy">
+  </div>
+  {% endif %}
+  <div class="project-info">
+    <h3 class="project-title">{{ project.title }}</h3>
+    <p class="project-description">{{ project.description }}</p>
+    {% if project.links %}
+    <div class="project-links">
+      {% for link in project.links %}
+      <a href="{{ link.url }}" class="project-link">{{ link.label }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</article>
