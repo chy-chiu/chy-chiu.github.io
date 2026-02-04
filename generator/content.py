@@ -113,6 +113,8 @@ def load_page(path: str, section: str) -> Optional[Page]:
         url = '/'
     elif section == 'research':
         url = '/research/'
+    elif section == 'now':
+        url = '/now/'
     else:
         url = f'/{section}/{slug}/'
 
@@ -212,6 +214,12 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
         research_page = load_page(research_path, 'research')
         if research_page:
             index.pages[research_page.slug] = research_page
+
+    now_path = os.path.join(content_dir, 'now.md')
+    if os.path.exists(now_path):
+        now_page = load_page(now_path, 'now')
+        if now_page:
+            index.pages[now_page.slug] = now_page
 
     # Load writing posts
     writing_dir = os.path.join(content_dir, 'writing')

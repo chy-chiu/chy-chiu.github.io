@@ -109,18 +109,33 @@ class Builder:
                 logger.warning(f"{page.slug}: {warning}")
 
     def _render_static_pages(self):
-        """Render static pages (about, research)."""
-        # Render about page
+        """Render static pages (about, research, now)."""
+        # Render homepage (about + recent writing + papers)
         about_slug = 'about'
         if about_slug in self.content.pages:
             page = self.content.pages[about_slug]
+
+            def year_sort_key(pub):
+                try:
+                    return int(str(pub.year).strip())
+                except Exception:
+                    return -1
+
+            recent_publications = sorted(
+                list(self.publications.values()),
+                key=lambda p: (year_sort_key(p), p.title.lower()),
+                reverse=True,
+            )[:3]
+
             html = self.templates.render(
-                'page.html',
+                'home.html',
                 page=page,
+                recent_writing=self.content.writing[:3],
+                recent_publications=recent_publications,
                 current_url='/'
             )
             self._write_file('output/index.html', html)
-            logger.info("Rendered about page (index.html)")
+            logger.info("Rendered homepage (index.html)")
 
         # Render research page
         research_slug = 'research'
@@ -144,6 +159,18 @@ class Builder:
             )
             self._write_file('output/research/index.html', html)
             logger.info("Rendered research page")
+
+        # Render now page (optional)
+        now_slug = 'now'
+        if now_slug in self.content.pages:
+            page = self.content.pages[now_slug]
+            html = self.templates.render(
+                'page.html',
+                page=page,
+                current_url='/now/'
+            )
+            self._write_file('output/now/index.html', html)
+            logger.info("Rendered now page")
 
     def _render_writing(self):
         """Render writing section pages."""

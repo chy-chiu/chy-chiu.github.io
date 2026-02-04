@@ -17,13 +17,13 @@ Build a Python-based static site generator that converts Obsidian-flavored markd
 Generate the following directory structure:
 
 ```
-ssg/
+generator/
 ├── build.py                    # Main entry point, CLI
 ├── config.yaml                 # Site configuration
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # Usage documentation
 │
-├── ssg/                        # Python package
+├── generator/                        # Python package
 │   ├── __init__.py
 │   ├── config.py               # Config loading and validation
 │   ├── content.py              # Content loading and parsing
@@ -1317,3 +1317,127 @@ output/
 - Client-side search
 - Backlinks support
 - Margin notes (Distill-style)
+
+# Clarifying questions for user
+
+## Information Architecture
+
+- [ ] What should the homepage “feel” like: short bio + highlights (current), or a true landing page with sections (bio, writing, research, now, links)?
+A proper landing page would be good (use placeholder information and let me ruminate on what to put in. Your suggestion also welcome)
+- [ ] Should the homepage title stay `"About"` or be something like `"Home"` / your name?
+Homepage title should just be "Hello" or something
+- [ ] Should there be a separate `/about/` page, or is the homepage content the “about” page?
+Separate about page yes. Homepage content is a shorter version of about page 
+- [ ] Do you want a dedicated `/cv/` or `/contact/` page?
+That will be a section in the About page
+- [ ] Do you want “Writing” and “Notes” to stay separate, or merge into a single feed with filters?
+I want them separate conceptually, but together in stuff like Tag pages 
+
+## Homepage Content
+
+- [ ] For “Recent writing”, should it pull from Writing only, or Writing + Notes?
+Let's do writing only for now
+- [ ] Should the homepage show 3 items exactly, or “up to 3” if fewer exist?
+Up to 3 if fewer exist
+- [ ] What should display for each recent post: title only, title+subtitle, date, tags, and/or a short excerpt?
+Title and subtitle + date, no excerpt
+- [ ] Should the homepage also show “Recent notes” as a separate block?
+No just recent writing maybe 
+- [ ] Should there be a “Featured” post list (manual pinning) in addition to “Recent”?
+Yeah if possible that would be good
+
+## Publications (“Papers”)
+
+- [ ] What counts as a “paper”: all BibTeX entries, or only a subset (e.g., `@article` / `@inproceedings`)?
+all bibtex entries
+- [ ] Should “Recent papers” be sorted by `year` only (current), or by an explicit `month` / `date` field?
+Sort by year and month
+- [ ] Do you want to highlight *selected* papers on the homepage (manual list) rather than most-recent?
+Yes please
+- [ ] Author formatting preference: full author list, or “First Author et al.” after N authors?
+Full author list for Research page, but et al. for front page
+Also give me option to highlight my own name if possible 
+- [ ] Should titles be linked to `url` by default (in addition to `[Paper]`)?
+Yes
+
+## “Now” Page
+
+- [ ] What sections do you want on `/now/` (e.g., research focus, writing queue, reading list, personal updates)?
+Can you make the now page a list of dates and stuff, with past dates / events striked through (add examples)
+- [ ] Do you want an optional “Last updated” date in frontmatter and displayed on the page?
+Yes that will be good
+- [ ] Should `/now/` be linked in the main nav (current), or be tucked away (footer only)?
+In main nav also 
+
+## Writing Workflow
+
+- [ ] Are you writing in Obsidian and exporting directly from the vault into `content/`, or writing directly in this repo?
+Writing in obsidian
+- [ ] Do you want “draft” posts to be previewable locally but excluded from deploy (current behavior)?
+Yes
+- [ ] Do you want automatic filename-to-slug behavior, or always slugify from title (current)?
+slugify from title is good
+- [ ] Do you want RSS (Writing only, Notes only, or both)?
+RSS for writing only
+
+## Design & UX
+
+- [ ] Do you want the nav to stay sticky (current), or be static?
+Sticky. In addition I want to nav to collapse into hamburger menu if screen too small if possible
+Another thing about nav is the dark mode options has a weird border around the button
+- [ ] Do you want a homepage hero section with your name, roles, and key links (email/GitHub/Twitter)?
+Yeah that will be good but keep it thin potentially
+- [ ] Do you want a “reading time” estimate and/or word count on posts?
+Make it a toggle-able feature
+- [ ] Should the site support wide figures only, or also full-bleed figures for some posts?
+Full bleed figures for some posts, and also narrower figures for some also where possible
+
+
+## SEO / Social / Metadata
+
+- [ ] Preferred canonical URL style: trailing slash everywhere (current), or no trailing slash?
+trailing sesh everywhere is good
+- [ ] Do you want per-page `description` in frontmatter for meta tags?
+Yeah that will be u seful
+- [ ] Do you want OpenGraph images per post, and if so: auto-generated or manually provided?
+Per post, auto-generated
+
+## Deployment / Ops
+
+- [ ] Target hosting: GitHub Pages, Netlify, Cloudflare Pages, or something else?
+Github paghes
+- [ ] Should the build output be committed to git, or built in CI and deployed from artifacts?
+Build in CI then deployed from artifacts
+- [ ] Do you want a CI pipeline (GitHub Actions) that runs build + link checking + deploy?
+Yes pls
+- [ ] Any privacy constraints: no external fonts, no MathJax CDN, no analytics?
+Not for now 
+
+## TODOs (Production Readiness)
+
+### For you (site owner)
+
+- [ ] Replace placeholder site metadata in `config.yaml`
+- [ ] Fill out `content/about.md` with your real homepage copy
+- [ ] Write `content/now.md` with a clear “last updated” cadence (weekly/monthly)
+- [ ] Add at least 3 real posts in `content/writing/` so homepage highlights are meaningful
+- [ ] Add your real `content/publications.bib` (or decide to hide the papers block)
+- [ ] Add a favicon and OG image assets (optional, but recommended)
+
+### For the generator (next engineering tasks)
+
+- [ ] Add optional `home:` config block (counts, include sections, featured items)
+- [ ] Add per-page frontmatter `description` and wire to meta tags
+- [ ] Add link-checker step (warn on broken internal links and missing assets)
+- [ ] Add RSS feed generation for Writing/Notes
+- [ ] Add sitemap.xml + robots.txt generation
+- [ ] Add basic tests for: frontmatter parsing, slugify, URL routing, build output paths
+- [ ] Add `--serve` dev server (and optional live reload) if desired
+- [ ] Add 404 page generation (`output/404.html`) for GitHub Pages
+- [ ] Add “archive” pages (e.g., `/writing/2024/`) and/or “all posts” pagination
+- [ ] Improve publication sorting (support `month`, `date`, or `sort_key` fields)
+- [ ] Add optional “selected publications” list for homepage + research
+- [ ] Make build fail-fast for hard errors, but keep soft warnings for missing optional inputs
+- [ ] Add deterministic builds (stable ordering, reproducible output)
+- [ ] Add a `--watch` mode if you want instant rebuilds on file changes
+- [ ] For the distill style blogposts, move content page to side bar (and only up if not available), also have a back to top option etc.

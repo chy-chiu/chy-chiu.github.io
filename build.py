@@ -10,7 +10,7 @@ Usage:
 
 import argparse
 import sys
-from ssg.builder import Builder
+from generator.builder import Builder
 
 
 def main():

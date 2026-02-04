@@ -27,7 +27,8 @@ pip install -r requirements.txt
 ├── build.py              # Build script
 ├── config.yaml           # Site configuration
 ├── content/              # Your markdown content
-│   ├── about.md          # About page (homepage)
+│   ├── about.md          # Homepage content (also shows recent writing + papers)
+│   ├── now.md            # "Now" page
 │   ├── research.md       # Research page
 │   ├── publications.bib  # BibTeX file
 │   ├── projects/         # Project markdown files
@@ -72,13 +73,22 @@ The generated site will be in the `output/` directory. Deploy to:
 
 ### Static Pages
 
-**About Page** (`content/about.md`):
+**Homepage** (`content/about.md`):
 ```markdown
 ---
 title: "About"
 ---
 
 Your about content here...
+```
+
+**Now Page** (`content/now.md`):
+```markdown
+---
+title: "Now"
+---
+
+What you’re focused on right now...
 ```
 
 **Research Page** (`content/research.md`):
