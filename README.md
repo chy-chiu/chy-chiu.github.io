@@ -27,7 +27,8 @@ pip install -r requirements.txt
 ├── build.py              # Build script
 ├── config.yaml           # Site configuration
 ├── content/              # Your markdown content
-│   ├── about.md          # Homepage content (also shows recent writing + papers)
+│   ├── home.md           # Homepage content (landing copy)
+│   ├── about.md          # About page (/about/)
 │   ├── now.md            # "Now" page
 │   ├── research.md       # Research page
 │   ├── publications.bib  # BibTeX file
@@ -49,6 +50,12 @@ pip install -r requirements.txt
 python build.py
 ```
 
+### Serve Locally
+
+```bash
+python build.py --serve
+```
+
 ### Build with Drafts
 
 ```bash
@@ -61,35 +68,85 @@ python build.py --drafts
 python build.py --clean
 ```
 
+### Strictness
+
+By default the build fails if the generated site contains broken internal links or missing assets.
+
+```bash
+python build.py --no-strict
+```
+
 ### Deploy
 
 The generated site will be in the `output/` directory. Deploy to:
 
-- **GitHub Pages**: Push `output/` to `gh-pages` branch
+- **GitHub Pages (recommended)**: Use `.github/workflows/pages.yml` to build and deploy from the `output/` artifact
 - **Netlify**: Point to `output/` directory
 - **Any static host**: Upload `output/` contents
+
+Generated extras:
+
+- `output/rss.xml` (Writing-only RSS feed)
+- `output/sitemap.xml` and `output/robots.txt`
+- `output/404.html` (GitHub Pages-friendly)
+- `output/og/...` (auto-generated OpenGraph SVG images)
+- Year archives: `/writing/YYYY/` and `/notes/YYYY/`
 
 ## Content Guide
 
 ### Static Pages
 
-**Homepage** (`content/about.md`):
+**Homepage** (`content/home.md`):
+```markdown
+---
+title: "Hello"
+description: "Landing page with recent writing and selected papers."
+---
+
+Landing copy here...
+```
+
+**About Page** (`content/about.md`):
 ```markdown
 ---
 title: "About"
+description: "Background, interests, and contact."
 ---
 
-Your about content here...
+Longer bio + CV/contact here...
 ```
 
 **Now Page** (`content/now.md`):
 ```markdown
 ---
 title: "Now"
+updated: 2026-02-04
 ---
 
 What you’re focused on right now...
 ```
+
+### Featured Writing (Homepage)
+
+Mark a Writing post as featured:
+
+```yaml
+featured: true
+featured_order: 10
+```
+
+Or pin by slug in `config.yaml` under `home.featured_writing`.
+
+### Selected Publications (Homepage)
+
+Mark a BibTeX entry as selected:
+
+```bibtex
+selected = "true",
+month = "10",
+```
+
+If no selected entries exist, the homepage falls back to showing the most recent by `year` + `month`.
 
 **Research Page** (`content/research.md`):
 ```markdown
@@ -217,13 +274,17 @@ Edit `config.yaml` to customize:
 
 ## Deployment to GitHub Pages
 
-1. Build the site: `python build.py`
-2. Create a `gh-pages` branch
-3. Copy contents of `output/` to the branch
-4. Push to GitHub
-5. Enable GitHub Pages in repository settings
+Recommended (GitHub Actions):
 
-Or use GitHub Actions for automatic deployment (see `.github/workflows/` for examples).
+1. Push to `main`
+2. In GitHub repo settings: enable Pages with “Source: GitHub Actions”
+3. The workflow in `.github/workflows/pages.yml` builds and deploys `output/`
+
+## Tests
+
+```bash
+python -m unittest discover -s tests
+```
 
 ## Roadmap
 
@@ -233,11 +294,12 @@ Or use GitHub Actions for automatic deployment (see `.github/workflows/` for exa
 - ✅ Code highlighting, MathJax
 - ✅ Dark mode toggle
 - ✅ Publications list
+- ✅ RSS feed (Writing)
+- ✅ sitemap.xml + robots.txt + 404
 
 ### v1.1 (Planned)
 - In-text citations `[@key]`
 - Live reload dev server
-- RSS feed generation
 
 ### v1.2 (Future)
 - Client-side search

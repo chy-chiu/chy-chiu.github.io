@@ -1,7 +1,7 @@
 ---
 title: "Example Project"
 description: "A demonstration of the project card feature"
-image: "project-placeholder.png"
+image: "example.svg"
 links:
   - label: "Paper"
     url: "https://arxiv.org/abs/example"

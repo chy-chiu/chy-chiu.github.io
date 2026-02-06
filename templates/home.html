@@ -10,6 +10,31 @@
     {{ page.html_content | safe }}
   </div>
 
+  {% if featured_writing %}
+  <section class="home-section">
+    <h2>Featured Writing</h2>
+    <ul class="post-list">
+      {% for post in featured_writing %}
+      <li class="post-item">
+        <article>
+          <a href="{{ post.url }}" class="post-link">
+            <h3 class="post-title">{{ post.title }}</h3>
+            {% if post.subtitle %}
+            <p class="post-subtitle">{{ post.subtitle }}</p>
+            {% endif %}
+          </a>
+          <div class="post-meta">
+            {% if post.date %}
+            <time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%B %d, %Y') }}</time>
+            {% endif %}
+          </div>
+        </article>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
   {% if recent_writing %}
   <section class="home-section">
     <h2>Recent Writing</h2>
@@ -27,13 +52,6 @@
             {% if post.date %}
             <time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%B %d, %Y') }}</time>
             {% endif %}
-            {% if post.tags %}
-            <span class="post-tags">
-              {% for tag in post.tags %}
-              <a href="/tags/{{ tag | slugify }}/" class="tag">{{ tag }}</a>
-              {% endfor %}
-            </span>
-            {% endif %}
           </div>
         </article>
       </li>
@@ -43,12 +61,12 @@
   </section>
   {% endif %}
 
-  {% if recent_publications %}
-  <section class="home-section publications-section">
-    <h2>Recent Papers</h2>
+  {% if publications %}
+  <section class="home-section publications-section home-publications">
+    <h2>{{ publications_title }}</h2>
     <ul class="pub-list">
-      {% for pub in recent_publications %}
-      {% include "partials/publication.html" %}
+      {% for pub in publications %}
+      {% include "partials/publication.html" with context %}
       {% endfor %}
     </ul>
     <p><a href="/research/">Research →</a></p>
@@ -56,4 +74,3 @@
   {% endif %}
 </article>
 {% endblock %}
-

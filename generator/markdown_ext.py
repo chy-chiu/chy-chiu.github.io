@@ -233,6 +233,12 @@ class MarkdownProcessor:
                 continue
 
             alt_text = img.get('alt', '')
+            figure_variant = None
+            alt_match = re.match(r'^\s*(full|narrow|wide)\s*:\s*(.*)$', alt_text, re.IGNORECASE)
+            if alt_match:
+                figure_variant = alt_match.group(1).lower()
+                alt_text = alt_match.group(2).strip()
+                img['alt'] = alt_text
 
             # Resolve image path
             src = img.get('src', '')
@@ -242,7 +248,12 @@ class MarkdownProcessor:
             img['loading'] = 'lazy'
 
             # Create figure
-            figure = soup.new_tag('figure', attrs={'class': 'image-figure'})
+            figure_class = 'image-figure'
+            if figure_variant == 'full':
+                figure_class += ' image-figure-full'
+            elif figure_variant == 'narrow':
+                figure_class += ' image-figure-narrow'
+            figure = soup.new_tag('figure', attrs={'class': figure_class})
             figcaption = soup.new_tag('figcaption')
             figcaption.string = alt_text
 

@@ -4,7 +4,7 @@ Configuration loading and validation
 
 import yaml
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from pathlib import Path
 
 
@@ -25,6 +25,21 @@ class SiteConfig:
     description: str
     base_url: str
     author: str
+    links: List[Dict[str, str]] = field(default_factory=list)
+    author_highlight: Optional[str] = None
+
+
+@dataclass
+class HomeConfig:
+    recent_writing_count: int = 3
+    featured_writing: List[str] = field(default_factory=list)  # slugs
+    papers_count: int = 3
+    featured_publications: List[str] = field(default_factory=list)  # BibTeX keys
+
+
+@dataclass
+class FeatureConfig:
+    reading_time: bool = False
 
 
 @dataclass
@@ -54,6 +69,8 @@ class Config:
     nav: List[NavItem]
     style: StyleConfig
     math: bool = True
+    home: HomeConfig = field(default_factory=HomeConfig)
+    features: FeatureConfig = field(default_factory=FeatureConfig)
 
 
 def load_config(path: str = "config.yaml") -> Config:
@@ -100,7 +117,9 @@ def load_config(path: str = "config.yaml") -> Config:
         title=site_data['title'],
         description=site_data['description'],
         base_url=site_data['base_url'].rstrip('/'),  # Remove trailing slash
-        author=site_data['author']
+        author=site_data['author'],
+        links=site_data.get('links', []) or [],
+        author_highlight=site_data.get('author_highlight'),
     )
 
     # Parse navigation
@@ -114,4 +133,10 @@ def load_config(path: str = "config.yaml") -> Config:
     # Parse math flag
     math = data.get('math', True)
 
-    return Config(site=site, nav=nav, style=style, math=math)
+    # Parse home config
+    home = HomeConfig(**(data.get('home', {}) or {}))
+
+    # Parse feature flags
+    features = FeatureConfig(**(data.get('features', {}) or {}))
+
+    return Config(site=site, nav=nav, style=style, math=math, home=home, features=features)

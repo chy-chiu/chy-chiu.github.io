@@ -3,18 +3,37 @@ site:
   description: "Researcher, Writer, Thinker"
   base_url: "https://yourusername.github.io"
   author: "Your Name"
+  author_highlight: "Your Name"
+  links:
+    - label: "CV"
+      url: "/about/"
+    - label: "Email"
+      url: "mailto:your.email@example.com"
+    - label: "Scholar"
+      url: "https://scholar.google.com/"
+    - label: "GitHub"
+      url: "https://github.com/yourusername"
+    - label: "Twitter"
+      url: "https://twitter.com/yourusername"
 
 nav:
   - label: "About"
-    url: "/"
-  - label: "Now"
-    url: "/now/"
+    url: "/about/"
   - label: "Research"
     url: "/research/"
   - label: "Writing"
     url: "/writing/"
   - label: "Notes"
     url: "/notes/"
+
+home:
+  recent_writing_count: 3
+  featured_writing: []          # e.g. ["my-favorite-post"]
+  papers_count: 3
+  featured_publications: []     # e.g. ["smith2024"]
+
+features:
+  reading_time: false           # show word count + reading time on posts
 
 style:
   # Fonts (loaded from Google Fonts)

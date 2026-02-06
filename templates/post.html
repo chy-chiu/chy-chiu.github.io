@@ -9,6 +9,9 @@
     {% endif %}
     <div class="post-meta">
       <time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%B %d, %Y') }}</time>
+      {% if config.features.reading_time and post.word_count %}
+      <span class="post-reading-time">{{ post.word_count }} words · {{ post.reading_time_minutes }} min</span>
+      {% endif %}
       {% if post.tags %}
       <span class="post-tags">
         {% for tag in post.tags %}
@@ -19,16 +22,29 @@
     </div>
   </header>
 
-  {% if post.toc and toc_html %}
-  {{ toc_html | safe }}
-  {% endif %}
+  <div class="post-layout">
+    <div class="post-main">
+      <div class="post-content prose">
+        {{ post.html_content | safe }}
+      </div>
 
-  <div class="post-content prose">
-    {{ post.html_content | safe }}
+      {% if post.bibliography_html %}
+      {{ post.bibliography_html | safe }}
+      {% endif %}
+
+      <p class="back-to-top">
+        <a href="#top">Back to top</a>
+      </p>
+    </div>
+
+    {% if post.toc and toc_html %}
+    <aside class="post-sidebar" aria-label="On this page">
+      <div class="post-sidebar-inner">
+        {{ toc_html | safe }}
+        <a class="back-to-top-link" href="#top">Back to top</a>
+      </div>
+    </aside>
+    {% endif %}
   </div>
-
-  {% if post.bibliography_html %}
-  {{ post.bibliography_html | safe }}
-  {% endif %}
 </article>
 {% endblock %}

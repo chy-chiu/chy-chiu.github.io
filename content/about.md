@@ -1,22 +1,18 @@
 ---
 title: "About"
+description: "Background, interests, and contact."
 ---
 
-# Welcome
+# About
 
-Hi, I'm **Your Name**, a researcher and writer interested in [your interests].
+Hi, I’m **Your Name**. I work on [your interests].
 
 ## Background
 
-Add your background information here. This page serves as your homepage.
+Add your longer-form bio here. This is your “About” page (separate from the homepage).
 
-## Contact
+## CV / Contact
 
 - Email: your.email@example.com
-- Twitter: [@yourusername](https://twitter.com/yourusername)
-- GitHub: [yourusername](https://github.com/yourusername)
-
----
-
-> [!tip] Getting Started
-> Edit this file at `content/about.md` to customize your homepage.
+- GitHub: https://github.com/yourusername
+- Twitter: https://twitter.com/yourusername

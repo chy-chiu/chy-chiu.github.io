@@ -74,7 +74,7 @@ $$
 
 ## Images
 
-![Example image caption - images are automatically styled as wide figures](example.jpg)
+![narrow: Example image caption - images are automatically styled as wide figures](example.svg)
 
 Images placed in `assets/images/` will be automatically resolved.
 
@@ -102,7 +102,7 @@ Ordered list:
 
 | Feature | Supported | Notes |
 |---------|-----------|-------|
-| Wiki links | ✅ | `[[page]]` syntax |
+| Wiki links | ✅ | `\\[\\[page\\]\\]` syntax |
 | Callouts | ✅ | Obsidian-style |
 | Math | ✅ | MathJax |
 | Code | ✅ | Pygments highlighting |

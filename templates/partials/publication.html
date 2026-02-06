@@ -1,6 +1,6 @@
 <li class="publication">
-  <span class="pub-authors">{{ pub.authors | join(', ') }}</span>.
-  "<span class="pub-title">{{ pub.title }}</span>."
+  <span class="pub-authors">{{ pub.authors | format_authors(pub_authors_mode or 'full') }}</span>.
+  "{% if pub.url %}<a class="pub-title" href="{{ pub.url }}">{{ pub.title }}</a>{% else %}<span class="pub-title">{{ pub.title }}</span>{% endif %}."
   <em class="pub-venue">{{ pub.venue }}</em>, {{ pub.year }}.
   {% if pub.url or pub.code %}
   <span class="pub-links">

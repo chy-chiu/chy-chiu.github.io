@@ -13,6 +13,9 @@ from .utils import to_url_slug, get_logger
 
 logger = get_logger()
 
+class ContentError(Exception):
+    pass
+
 
 @dataclass
 class Page:
@@ -23,9 +26,15 @@ class Page:
     raw_content: str
     date: Optional[datetime] = None
     subtitle: Optional[str] = None
+    description: Optional[str] = None
     tags: List[str] = field(default_factory=list)
     draft: bool = False
     toc: bool = False
+    updated: Optional[datetime] = None
+    word_count: int = 0
+    reading_time_minutes: int = 0
+    featured: bool = False
+    featured_order: int = 0
     html_content: str = ""
     toc_html: str = ""
     bibliography_html: str = ""
@@ -90,27 +99,26 @@ def load_page(path: str, section: str) -> Optional[Page]:
         with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
     except Exception as e:
-        logger.error(f"Failed to read {path}: {e}")
-        return None
+        raise ContentError(f"Failed to read {path}: {e}") from e
 
     frontmatter, body = parse_frontmatter(content)
 
     # Validate required fields for posts
     if section in ['writing', 'notes']:
         if 'title' not in frontmatter:
-            logger.error(f"Missing required field 'title' in {path}")
-            return None
+            raise ContentError(f"Missing required field 'title' in {path}")
         if 'date' not in frontmatter:
-            logger.error(f"Missing required field 'date' in {path}")
-            return None
+            raise ContentError(f"Missing required field 'date' in {path}")
 
     # Parse fields
     title = frontmatter.get('title', Path(path).stem)
     slug = to_url_slug(title)
 
     # Determine URL based on section
-    if section == 'about':
+    if section == 'home':
         url = '/'
+    elif section == 'about':
+        url = '/about/'
     elif section == 'research':
         url = '/research/'
     elif section == 'now':
@@ -131,8 +139,26 @@ def load_page(path: str, section: str) -> Optional[Page]:
             try:
                 date = datetime.strptime(str(date_value), '%Y-%m-%d')
             except ValueError:
-                logger.error(f"Invalid date format in {path}, expected YYYY-MM-DD")
-                return None
+                raise ContentError(f"Invalid date format in {path}, expected YYYY-MM-DD")
+
+    # Parse updated date (static pages)
+    updated = None
+    if 'updated' in frontmatter:
+        updated_value = frontmatter['updated']
+        if isinstance(updated_value, datetime):
+            updated = updated_value
+        elif isinstance(updated_value, date_type):
+            updated = datetime.combine(updated_value, datetime.min.time())
+        else:
+            try:
+                updated = datetime.strptime(str(updated_value), '%Y-%m-%d')
+            except ValueError:
+                raise ContentError(f"Invalid updated date format in {path}, expected YYYY-MM-DD")
+
+    # Simple word count (for reading time feature)
+    words = [w for w in body.split() if w.strip()]
+    word_count = len(words)
+    reading_time_minutes = max(1, (word_count + 199) // 200) if word_count else 0
 
     page = Page(
         title=title,
@@ -142,9 +168,15 @@ def load_page(path: str, section: str) -> Optional[Page]:
         raw_content=body,
         date=date,
         subtitle=frontmatter.get('subtitle'),
+        description=frontmatter.get('description'),
         tags=frontmatter.get('tags', []),
         draft=frontmatter.get('draft', False),
-        toc=frontmatter.get('toc', False)
+        toc=frontmatter.get('toc', False),
+        updated=updated,
+        word_count=word_count,
+        reading_time_minutes=reading_time_minutes,
+        featured=bool(frontmatter.get('featured', False)),
+        featured_order=int(frontmatter.get('featured_order', 0) or 0),
     )
 
     return page
@@ -164,18 +196,15 @@ def load_project(path: str) -> Optional[Project]:
         with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
     except Exception as e:
-        logger.error(f"Failed to read {path}: {e}")
-        return None
+        raise ContentError(f"Failed to read {path}: {e}") from e
 
     frontmatter, body = parse_frontmatter(content)
 
     # Validate required fields
     if 'title' not in frontmatter:
-        logger.error(f"Missing required field 'title' in {path}")
-        return None
+        raise ContentError(f"Missing required field 'title' in {path}")
     if 'description' not in frontmatter:
-        logger.error(f"Missing required field 'description' in {path}")
-        return None
+        raise ContentError(f"Missing required field 'description' in {path}")
 
     project = Project(
         title=frontmatter['title'],
@@ -203,11 +232,23 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
     index = ContentIndex()
 
     # Load static pages
+    home_path = os.path.join(content_dir, 'home.md')
     about_path = os.path.join(content_dir, 'about.md')
-    if os.path.exists(about_path):
-        about_page = load_page(about_path, 'about')
-        if about_page:
-            index.pages[about_page.slug] = about_page
+    if os.path.exists(home_path):
+        home_page = load_page(home_path, 'home')
+        if home_page:
+            index.pages[home_page.slug] = home_page
+
+        if os.path.exists(about_path):
+            about_page = load_page(about_path, 'about')
+            if about_page:
+                index.pages[about_page.slug] = about_page
+    else:
+        if os.path.exists(about_path):
+            # Backwards-compatible behavior: about.md is the homepage
+            about_page = load_page(about_path, 'home')
+            if about_page:
+                index.pages[about_page.slug] = about_page
 
     research_path = os.path.join(content_dir, 'research.md')
     if os.path.exists(research_path):
@@ -224,7 +265,7 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
     # Load writing posts
     writing_dir = os.path.join(content_dir, 'writing')
     if os.path.exists(writing_dir):
-        for filename in os.listdir(writing_dir):
+        for filename in sorted(os.listdir(writing_dir)):
             if filename.endswith('.md'):
                 path = os.path.join(writing_dir, filename)
                 page = load_page(path, 'writing')
@@ -243,7 +284,7 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
     # Load notes
     notes_dir = os.path.join(content_dir, 'notes')
     if os.path.exists(notes_dir):
-        for filename in os.listdir(notes_dir):
+        for filename in sorted(os.listdir(notes_dir)):
             if filename.endswith('.md'):
                 path = os.path.join(notes_dir, filename)
                 page = load_page(path, 'notes')
@@ -262,7 +303,7 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
     # Load projects
     projects_dir = os.path.join(content_dir, 'projects')
     if os.path.exists(projects_dir):
-        for filename in os.listdir(projects_dir):
+        for filename in sorted(os.listdir(projects_dir)):
             if filename.endswith('.md'):
                 path = os.path.join(projects_dir, filename)
                 project = load_project(path)

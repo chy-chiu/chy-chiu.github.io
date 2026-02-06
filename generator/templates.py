@@ -3,6 +3,7 @@ Jinja2 template management
 """
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from markupsafe import Markup, escape
 from .config import Config
 from .utils import to_url_slug, format_date
 
@@ -22,9 +23,32 @@ class TemplateEngine:
             autoescape=select_autoescape(['html', 'xml'])
         )
 
+        def format_authors(authors, mode: str = "full"):
+            highlight = (
+                getattr(self.config.site, "author_highlight", None)
+                or getattr(self.config.site, "author", "")
+                or ""
+            ).strip()
+            highlight_lower = highlight.lower()
+
+            authors_list = list(authors or [])
+            if mode == "etal" and len(authors_list) > 1:
+                display = f"{authors_list[0]} et al."
+                authors_list = [display]
+
+            out = []
+            for a in authors_list:
+                a_str = str(a)
+                if highlight_lower and highlight_lower in a_str.lower():
+                    out.append(Markup(f'<span class="author-highlight">{escape(a_str)}</span>'))
+                else:
+                    out.append(escape(a_str))
+            return Markup(", ").join(out)
+
         # Add custom filters
         self.env.filters['slugify'] = to_url_slug
         self.env.filters['date_format'] = format_date
+        self.env.filters['format_authors'] = format_authors
 
     def render(self, template_name: str, **context) -> str:
         """

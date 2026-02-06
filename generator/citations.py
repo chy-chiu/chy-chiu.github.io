@@ -15,6 +15,8 @@ class Publication:
     title: str
     venue: str
     year: str
+    month: int = 0
+    selected: bool = False
     url: Optional[str] = None
     code: Optional[str] = None
     abstract: Optional[str] = None
@@ -51,12 +53,39 @@ def load_bibtex(path: str) -> Dict[str, Publication]:
             # Get venue (journal or booktitle)
             venue = entry.get('journal') or entry.get('booktitle', '')
 
+            month_raw = (entry.get('month') or "").strip()
+            month_map = {
+                "jan": 1, "january": 1,
+                "feb": 2, "february": 2,
+                "mar": 3, "march": 3,
+                "apr": 4, "april": 4,
+                "may": 5,
+                "jun": 6, "june": 6,
+                "jul": 7, "july": 7,
+                "aug": 8, "august": 8,
+                "sep": 9, "sept": 9, "september": 9,
+                "oct": 10, "october": 10,
+                "nov": 11, "november": 11,
+                "dec": 12, "december": 12,
+            }
+            month = 0
+            if month_raw:
+                try:
+                    month = int(month_raw)
+                except ValueError:
+                    month = month_map.get(month_raw.lower(), 0)
+
+            selected_raw = str(entry.get('selected', '')).strip().lower()
+            selected = selected_raw in {'1', 'true', 'yes', 'y'}
+
             pub = Publication(
                 key=entry['ID'],
                 authors=authors,
                 title=entry.get('title', ''),
                 venue=venue,
                 year=entry.get('year', ''),
+                month=month,
+                selected=selected,
                 url=entry.get('url'),
                 code=entry.get('code'),
                 abstract=entry.get('abstract')

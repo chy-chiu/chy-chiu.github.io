@@ -1,3 +1,10 @@
 <footer class="footer">
-  <p>&copy; {{ "now"|date_format("%Y") }} {{ config.site.author }}. All rights reserved.</p>
+  {% if config.site.links %}
+  <ul class="footer-links">
+    {% for link in config.site.links %}
+    <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <p>&copy; {{ "now"|date_format("%Y") }} {{ config.site.author }}.</p>
 </footer>
