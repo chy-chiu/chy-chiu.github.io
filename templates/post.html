@@ -2,27 +2,36 @@
 
 {% block content %}
 <article class="post">
-  <header class="post-header">
-    <h1 class="post-title">{{ post.title }}</h1>
-    {% if post.subtitle %}
-    <p class="post-subtitle">{{ post.subtitle }}</p>
-    {% endif %}
-    <div class="post-meta">
-      <time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%B %d, %Y') }}</time>
-      {% if config.features.reading_time and post.word_count %}
-      <span class="post-reading-time">{{ post.word_count }} words · {{ post.reading_time_minutes }} min</span>
+  <div class="post-layout{% if post.toc and toc_html %} post-layout--with-sidebar{% endif %}">
+    <header class="post-header">
+      <h1 class="post-title">{{ post.title }}</h1>
+      {% if post.subtitle %}
+      <p class="post-subtitle">{{ post.subtitle }}</p>
       {% endif %}
-      {% if post.tags %}
-      <span class="post-tags">
-        {% for tag in post.tags %}
-        <a href="/tags/{{ tag | slugify }}/" class="tag">{{ tag }}</a>
-        {% endfor %}
-      </span>
-      {% endif %}
-    </div>
-  </header>
+      <div class="post-meta">
+        <time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%B %d, %Y') }}</time>
+        {% if config.features.reading_time and post.word_count %}
+        <span class="post-reading-time">{{ post.word_count }} words · {{ post.reading_time_minutes }} min</span>
+        {% endif %}
+        {% if post.tags %}
+        <span class="post-tags">
+          {% for tag in post.tags %}
+          <a href="/tags/{{ tag | slugify }}/" class="tag">{{ tag }}</a>
+          {% endfor %}
+        </span>
+        {% endif %}
+      </div>
+    </header>
 
-  <div class="post-layout">
+    {% if post.toc and toc_html %}
+    <aside class="post-sidebar" aria-label="On this page">
+      <div class="post-sidebar-inner">
+        {{ toc_html | safe }}
+        <a class="back-to-top-link" href="#top">Back to top</a>
+      </div>
+    </aside>
+    {% endif %}
+
     <div class="post-main">
       <div class="post-content prose">
         {{ post.html_content | safe }}
@@ -36,15 +45,6 @@
         <a href="#top">Back to top</a>
       </p>
     </div>
-
-    {% if post.toc and toc_html %}
-    <aside class="post-sidebar" aria-label="On this page">
-      <div class="post-sidebar-inner">
-        {{ toc_html | safe }}
-        <a class="back-to-top-link" href="#top">Back to top</a>
-      </div>
-    </aside>
-    {% endif %}
   </div>
 </article>
 {% endblock %}
