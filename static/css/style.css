@@ -96,8 +96,8 @@ body {
 .nav {
   max-width: var(--content-width);
   margin: 0 auto;
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
   padding-bottom: var(--space-md);
   padding-top: var(--space-md);
   display: flex;
@@ -386,12 +386,14 @@ body {
   margin-right: auto;
 }
 
-.post-header{
+.post-header {
   margin-bottom: var(--space-sm);
-  max-width: var(--content-width);
+  width: 100%;
+  max-width: none;
   margin-left: 0;
-  margin-right: auto;
+  margin-right: 0;
   grid-area: header;
+  text-align: left;
 }
 
 .page-header h1,
@@ -403,7 +405,7 @@ body {
   line-height: 1.2;
 }
 
-.post-subtitle {
+.post-header .post-subtitle {
   font-size: 1.25rem;
   color: var(--color-text-muted);
   margin: var(--space-sm) 0;
@@ -418,6 +420,7 @@ body {
   flex-wrap: wrap;
   gap: var(--space-md);
   align-items: center;
+  justify-content: flex-start;
 }
 
 /* ===================================
@@ -459,7 +462,7 @@ body {
   color: var(--color-accent);
 }
 
-.post-subtitle {
+.post-item .post-subtitle {
   color: var(--color-text-muted);
   font-size: 1.05rem;
   margin-bottom: var(--space-sm);
@@ -498,6 +501,9 @@ body {
     "header"
     "main";
   gap: var(--space-xl);
+  max-width: var(--content-width);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .post-layout--with-sidebar {
@@ -548,7 +554,9 @@ body {
       "sidebar header"
       "sidebar main";
     gap: var(--space-lg);
-    justify-content: center;
+    max-width: calc(240px + var(--content-width) + var(--space-lg));
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .post-sidebar {

@@ -3,7 +3,7 @@
 {% block content %}
 <article class="post">
   <div class="post-layout{% if post.toc and toc_html %} post-layout--with-sidebar{% endif %}">
-    <header class="post-header{% if post.toc and toc_html %} post-header-left{% endif %}">
+    <header class="post-header">
       <h1 class="post-title">{{ post.title }}</h1>
       {% if post.subtitle %}
       <p class="post-subtitle">{{ post.subtitle }}</p>
