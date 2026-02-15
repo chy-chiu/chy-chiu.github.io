@@ -2,7 +2,7 @@
 (function() {
   const toggle = document.querySelector('.theme-toggle');
   const navToggle = document.querySelector('.nav-toggle');
-  const navLinks = document.querySelector('.nav-links');
+  const navLinks = document.querySelector('.nav-menu');
   const html = document.documentElement;
 
   // Check saved preference or system preference

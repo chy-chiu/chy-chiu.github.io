@@ -3,8 +3,4 @@ title: "Hello"
 description: "Landing page with recent writing and selected papers."
 ---
 
-This is the front page of my site.
-
-- If you’re new here, start with **About**.
-- If you want what I’m focusing on recently, see **Now**.
-
+My name is Chris (趙學賢). I'm a PhD student at the University of Cambridge under Mihaela van der Schaar. I believe intelligence emerges from interaction between the components of a complex system. My research asks how groups of AI agents can communicate, reason, and become more than the sum of their parts. Some of my recent [writing] and select [research] below.
