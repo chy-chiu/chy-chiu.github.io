@@ -5,7 +5,7 @@
   <header class="page-header">
     <h1>{{ page.title }}</h1>
     {% if page.updated %}
-    <p class="page-updated">Last updated {{ page.updated.strftime('%B %d, %Y') }}</p>
+    <p class="page-updated">Last updated {{ page.updated | date_format("%Y-%m-%d") }}</p>
     {% endif %}
   </header>
   <div class="page-content prose">

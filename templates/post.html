@@ -9,7 +9,7 @@
       <p class="post-subtitle">{{ post.subtitle }}</p>
       {% endif %}
       <div class="post-meta">
-        <time datetime="{{ post.date.isoformat() }}">{{ post.date.strftime('%B %d, %Y') }}</time>
+        <time datetime="{{ post.date.isoformat() }}">{{ post.date | date_format("%Y-%m-%d") }}</time>
         {% if config.features.reading_time and post.word_count %}
         <span class="post-reading-time">{{ post.word_count }} words · {{ post.reading_time_minutes }} min</span>
         {% endif %}

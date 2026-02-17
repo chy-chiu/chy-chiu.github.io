@@ -585,6 +585,32 @@ body {
   font-size: 1.25rem;
 }
 
+.home-recent-list .post-item {
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+}
+
+.home-recent-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-md);
+  text-decoration: none;
+}
+
+.home-recent-date {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.home-recent-title {
+  margin: 0;
+  text-align: right;
+  flex: 1 1 auto;
+}
+
 /* ===================================
    Tag Pages
    =================================== */

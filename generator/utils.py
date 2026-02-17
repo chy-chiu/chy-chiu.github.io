@@ -45,7 +45,7 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-def format_date(date: datetime, fmt: str = '%B %d, %Y') -> str:
+def format_date(date: datetime, fmt: str = '%Y-%m-%d') -> str:
     if isinstance(date, datetime):
         date = date
     elif isinstance(date, date_type):
@@ -55,6 +55,6 @@ def format_date(date: datetime, fmt: str = '%B %d, %Y') -> str:
         try:
             date = datetime.strptime(str(date), '%Y-%m-%d')
         except ValueError:
-            return None
+            return ''
 
     return date.strftime(fmt)
