@@ -1,8 +1,8 @@
 site:
-  title: "Your Name"
-  description: "Researcher, Writer, Thinker"
-  base_url: "https://yourusername.github.io"
-  author: "Your Name"
+  title: "Chris Chiu"
+  description: "Mind, Machine, Medicine"
+  base_url: "https://chiu.ai"
+  author: "Chris Chiu"
   author_highlight: "Your Name"
   links:
     - label: "CV"
@@ -33,28 +33,50 @@ home:
   featured_publications: []     # e.g. ["smith2024"]
 
 features:
-  reading_time: false           # show word count + reading time on posts
+  reading_time: true           # show word count + reading time on posts
 
 style:
-  # Fonts (loaded from Google Fonts)
-  font_body: "IBM Plex Sans"
-  font_mono: "IBM Plex Mono"
-  font_heading: "IBM Plex Sans"
+  fonts:
+    body: "Libre Baskerville"      # Google Font
+    mono: "IBM Plex Mono"          # Google Font
+    heading: "Friz Quadrata"       # local font in `assets/font/`
+    # link: "Libre Baskerville"    # optional: links inherit body font by default
+    heading_weight: 400
 
-  # Light mode colors
-  color_bg: "#ffffff"
-  color_text: "#1a1a1a"
-  color_text_muted: "#666666"
-  color_accent: "#0066cc"
-  color_border: "#e0e0e0"
-  color_code_bg: "#f5f5f5"
+  sizes:
+    root: "14px"                   # base rem size (html font-size)
+    prose: "1rem"                  # main content text
+    headings:
+      h1: "2.25rem"
+      h2: "1.75rem"
+      h3: "1.375rem"
+      h4: "1.125rem"
+    titles:
+      page: "2.5rem"               # page/post H1
+      post: "1.5rem"               # writing/notes list titles
+      home_h2: "1.5rem"            # home section headings
+      section_h2: "1.75rem"        # research/projects/publications headings
+      bibliography_h2: "1.5rem"
 
-  # Dark mode colors
-  color_bg_dark: "#1a1a1a"
-  color_text_dark: "#e0e0e0"
-  color_text_muted_dark: "#999999"
-  color_accent_dark: "#66b3ff"
-  color_border_dark: "#333333"
-  color_code_bg_dark: "#2d2d2d"
+  colors:
+    light:
+      bg: "#f0f4fcff"              # old lightMode.light
+      text: "#100F0F"              # old lightMode.dark
+      text_muted: "#403E3C"        # old lightMode.darkgray
+      accent: "#c66123ff"          # old lightMode.secondary
+      # link: "#c66123ff"          # optional: defaults to `accent`
+      # link_hover: "#c66123ff"    # optional: defaults to `link`/`accent`
+      border: "#d8dee9"            # old lightMode.lightgray
+      code_bg: "#d8dee9"           # old lightMode.lightgray
+
+    dark:
+      bg: "#100F0F"                # old darkMode.light
+      text: "#FFFCF0"              # old darkMode.dark
+      text_muted: "#878580"        # old darkMode.tertiary
+      accent: "#DA702C"            # old darkMode.secondary
+      # link: "#DA702C"
+      # link_hover: "#DA702C"
+      border: "#1C1B1A"            # old darkMode.lightgray
+      code_bg: "#1C1B1A"           # old darkMode.lightgray
 
 math: true  # Whether to load MathJax for mathematical notation

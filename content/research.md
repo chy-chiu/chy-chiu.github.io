@@ -1,9 +1,6 @@
 ---
 title: "Research"
 ---
-
-# Research
-
 My research focuses on [your research area]. I'm particularly interested in:
 
 - Topic 1

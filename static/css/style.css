@@ -2,11 +2,58 @@
    CSS Variables / Design Tokens
    =================================== */
 
+@font-face {
+  font-family: 'Friz Quadrata';
+  src: url('/assets/font/Friz%20Quadrata%20Regular/Friz%20Quadrata%20Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Friz Quadrata';
+  src: url('/assets/font/Friz%20Quadrata%20Regular%20Italic/Friz%20Quadrata%20Regular%20Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Friz Quadrata';
+  src: url('/assets/font/Friz%20Quadrata%20Bold/Friz%20Quadrata%20Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Friz Quadrata';
+  src: url('/assets/font/Friz%20Quadrata%20Bold%20Italic/Friz%20Quadrata%20Bold%20Italic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
+  /* Defaults. These are overridden at build-time by config.yaml via `templates/partials/head.html`. */
   /* Typography */
-  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
-  --font-heading: 'IBM Plex Sans', sans-serif;
+  --font-body: 'Libre Baskerville', 'Noto Sans TC', ui-serif, Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  --font-heading: 'Friz Quadrata', 'Marcellus', 'Noto Sans TC', 'Libre Baskerville', serif;
+  --font-weight-heading: 400;
+  --font-link: var(--font-body);
+
+  --font-size-root: 16px;
+  --font-size-prose: 1.125rem;
+  --font-size-h1: 2.25rem;
+  --font-size-h2: 1.75rem;
+  --font-size-h3: 1.375rem;
+  --font-size-h4: 1.125rem;
+  --font-size-page-title: 2.5rem;
+  --font-size-post-title: 1.5rem;
+  --font-size-home-h2: 1.5rem;
+  --font-size-section-h2: 1.75rem;
+  --font-size-bibliography-h2: 1.5rem;
 
   /* Sizing */
   --content-width: 680px;
@@ -26,6 +73,8 @@
   --color-text: #1a1a1a;
   --color-text-muted: #666666;
   --color-accent: #0066cc;
+  --color-link: var(--color-accent);
+  --color-link-hover: var(--color-accent);
   --color-border: #e0e0e0;
   --color-code-bg: #f5f5f5;
 }
@@ -35,6 +84,8 @@
   --color-text: #e0e0e0;
   --color-text-muted: #999999;
   --color-accent: #66b3ff;
+  --color-link: var(--color-accent);
+  --color-link-hover: var(--color-accent);
   --color-border: #333333;
   --color-code-bg: #2d2d2d;
 }
@@ -50,7 +101,7 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: var(--font-size-root);
   scroll-behavior: smooth;
 }
 
@@ -61,6 +112,26 @@ body {
   color: var(--color-text);
   background-color: var(--color-bg);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Links (site-wide defaults; specific components can override) */
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.12em;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration: none;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6,
+.nav-logo {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
 }
 
 /* ===================================
@@ -107,7 +178,6 @@ body {
 }
 
 .nav-logo {
-  font-weight: 700;
   font-size: 1.25rem;
   color: var(--color-text);
   text-decoration: none;
@@ -136,7 +206,7 @@ body {
 
 .nav-links a:hover,
 .nav-links a.active {
-  color: var(--color-accent);
+  color: var(--color-link-hover);
 }
 
 .nav-toggle {
@@ -263,7 +333,7 @@ body {
 }
 
 .footer-links a:hover {
-  color: var(--color-accent);
+  color: var(--color-link-hover);
 }
 
 /* ===================================
@@ -271,7 +341,7 @@ body {
    =================================== */
 
 .prose {
-  font-size: 1.125rem;
+  font-size: var(--font-size-prose);
   line-height: 1.7;
   max-width: var(--content-width);
   margin-left: auto;
@@ -279,32 +349,28 @@ body {
 }
 
 .prose h1 {
-  font-size: 2.25rem;
-  font-weight: 700;
+  font-size: var(--font-size-h1);
   margin-top: 3rem;
   margin-bottom: 1rem;
   line-height: 1.2;
 }
 
 .prose h2 {
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: var(--font-size-h2);
   margin-top: 2.5rem;
   margin-bottom: 0.75rem;
   line-height: 1.3;
 }
 
 .prose h3 {
-  font-size: 1.375rem;
-  font-weight: 600;
+  font-size: var(--font-size-h3);
   margin-top: 2rem;
   margin-bottom: 0.5rem;
   line-height: 1.4;
 }
 
 .prose h4 {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: var(--font-size-h4);
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
@@ -318,7 +384,8 @@ body {
 }
 
 .prose a {
-  color: var(--color-accent);
+  color: var(--color-link);
+  font-family: var(--font-link);
   text-decoration: underline;
   transition: opacity 0.2s ease;
 }
@@ -399,8 +466,7 @@ body {
 .page-header h1,
 .post-header h1,
 .section-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: var(--font-size-page-title);
   margin: 0 0 var(--space-sm) 0;
   line-height: 1.2;
 }
@@ -451,15 +517,14 @@ body {
 }
 
 .post-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: var(--font-size-post-title);
   color: var(--color-text);
   margin-bottom: var(--space-sm);
   transition: color 0.2s ease;
 }
 
 .post-link:hover .post-title {
-  color: var(--color-accent);
+  color: var(--color-link-hover);
 }
 
 .post-item .post-subtitle {
@@ -486,7 +551,7 @@ body {
 }
 
 .tag:hover {
-  background: var(--color-accent);
+  background: var(--color-link-hover);
   color: var(--color-bg);
 }
 
@@ -544,7 +609,7 @@ body {
 }
 
 .back-to-top-link:hover {
-  color: var(--color-accent);
+  color: var(--color-link-hover);
 }
 
 @media (min-width: 980px) {
@@ -576,8 +641,7 @@ body {
 }
 
 .home-section h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: var(--font-size-home-h2);
   margin-bottom: var(--space-lg);
 }
 
@@ -867,7 +931,7 @@ body {
    =================================== */
 
 .citation {
-  color: var(--color-accent);
+  color: var(--color-link);
   cursor: help;
   position: relative;
   text-decoration: none;
@@ -885,7 +949,7 @@ body {
 }
 
 .bibliography h2 {
-  font-size: 1.5rem;
+  font-size: var(--font-size-bibliography-h2);
   margin-bottom: var(--space-lg);
 }
 
@@ -914,7 +978,6 @@ body {
 .toc-title {
   font-size: 1rem;
   margin-bottom: var(--space-sm);
-  font-weight: 600;
 }
 
 .toc-list {
@@ -935,7 +998,7 @@ body {
 }
 
 .toc-list a:hover {
-  color: var(--color-accent);
+  color: var(--color-link-hover);
 }
 
 /* ===================================
@@ -959,7 +1022,7 @@ body {
 }
 
 .projects-section h2 {
-  font-size: 1.75rem;
+  font-size: var(--font-size-section-h2);
   margin-bottom: var(--space-lg);
 }
 
@@ -995,7 +1058,6 @@ body {
 .project-title {
   margin: 0 0 var(--space-sm);
   font-size: 1.125rem;
-  font-weight: 600;
 }
 
 .project-description {
@@ -1013,16 +1075,16 @@ body {
 
 .project-link {
   font-size: 0.9rem;
-  color: var(--color-accent);
+  color: var(--color-link);
   text-decoration: none;
   padding: 0.25rem 0.75rem;
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--color-link);
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .project-link:hover {
-  background: var(--color-accent);
+  background: var(--color-link-hover);
   color: var(--color-bg);
 }
 
@@ -1035,7 +1097,7 @@ body {
 }
 
 .publications-section h2 {
-  font-size: 1.75rem;
+  font-size: var(--font-size-section-h2);
   margin-bottom: var(--space-lg);
 }
 
@@ -1047,7 +1109,6 @@ body {
   font-size: 1.25rem;
   color: var(--color-text-muted);
   margin-bottom: var(--space-md);
-  font-weight: 600;
 }
 
 .pub-list {
@@ -1064,7 +1125,7 @@ body {
 }
 
 .publication:hover {
-  border-left-color: var(--color-accent);
+  border-left-color: var(--color-link-hover);
 }
 
 .pub-title {
@@ -1081,7 +1142,7 @@ body {
 
 .pub-links a {
   font-size: 0.9rem;
-  color: var(--color-accent);
+  color: var(--color-link);
   text-decoration: none;
   margin-right: var(--space-sm);
 }

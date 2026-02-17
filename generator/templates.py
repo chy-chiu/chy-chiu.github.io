@@ -49,6 +49,57 @@ class TemplateEngine:
         self.env.filters['slugify'] = to_url_slug
         self.env.filters['date_format'] = format_date
         self.env.filters['format_authors'] = format_authors
+        self.env.filters['font_stack'] = self._font_stack
+
+    @staticmethod
+    def _font_stack(primary: str, kind: str) -> Markup:
+        """
+        Build a safe CSS font-family stack from a primary font.
+
+        If `primary` already looks like a stack (contains a comma), it is returned as-is.
+        """
+        primary = (primary or "").strip()
+        if not primary:
+            primary = "serif" if kind in {"body", "heading"} else "monospace"
+
+        if "," in primary:
+            return Markup(primary)
+
+        def q(name: str) -> str:
+            name = (name or "").strip().strip('"').strip("'")
+            return f"'{name}'" if name else ""
+
+        if kind == "mono":
+            return Markup(
+                ", ".join(
+                    [
+                        q(primary),
+                        "ui-monospace",
+                        "SFMono-Regular",
+                        "Menlo",
+                        "Monaco",
+                        "Consolas",
+                        "'Liberation Mono'",
+                        "monospace",
+                    ]
+                )
+            )
+
+        if kind == "heading":
+            return Markup(
+                ", ".join(
+                    [
+                        q(primary),
+                        "'Marcellus'",
+                        "'Noto Sans TC'",
+                        "'Libre Baskerville'",
+                        "serif",
+                    ]
+                )
+            )
+
+        # body
+        return Markup(", ".join([q(primary), "'Noto Sans TC'", "ui-serif", "Georgia", "serif"]))
 
     def render(self, template_name: str, **context) -> str:
         """

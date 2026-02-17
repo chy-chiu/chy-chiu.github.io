@@ -2,9 +2,6 @@
 title: "About"
 description: "Background, interests, and contact."
 ---
-
-# About
-
 Hi, I’m **Your Name**. I work on [your interests].
 
 ## Background

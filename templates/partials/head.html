@@ -20,7 +20,50 @@
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Libre+Baskerville:wght@400;700&family=Marcellus&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 
 <!-- Stylesheet -->
 <link rel="stylesheet" href="/static/css/style.css">
+
+<!-- Config-driven theme tokens -->
+<style>
+  :root {
+    --font-body: {{ config.style.font_body | font_stack('body') }};
+    --font-mono: {{ config.style.font_mono | font_stack('mono') }};
+    --font-heading: {{ config.style.font_heading | font_stack('heading') }};
+    --font-weight-heading: {{ config.style.font_weight_heading }};
+    --font-link: {{ (config.style.font_link or config.style.font_body) | font_stack('body') }};
+
+    --font-size-root: {{ config.style.font_size_root }};
+    --font-size-prose: {{ config.style.font_size_prose }};
+    --font-size-h1: {{ config.style.font_size_h1 }};
+    --font-size-h2: {{ config.style.font_size_h2 }};
+    --font-size-h3: {{ config.style.font_size_h3 }};
+    --font-size-h4: {{ config.style.font_size_h4 }};
+    --font-size-page-title: {{ config.style.font_size_page_title }};
+    --font-size-post-title: {{ config.style.font_size_post_title }};
+    --font-size-home-h2: {{ config.style.font_size_home_h2 }};
+    --font-size-section-h2: {{ config.style.font_size_section_h2 }};
+    --font-size-bibliography-h2: {{ config.style.font_size_bibliography_h2 }};
+
+    --color-bg: {{ config.style.color_bg }};
+    --color-text: {{ config.style.color_text }};
+    --color-text-muted: {{ config.style.color_text_muted }};
+    --color-accent: {{ config.style.color_accent }};
+    --color-link: {{ config.style.color_link or config.style.color_accent }};
+    --color-link-hover: {{ config.style.color_link_hover or (config.style.color_link or config.style.color_accent) }};
+    --color-border: {{ config.style.color_border }};
+    --color-code-bg: {{ config.style.color_code_bg }};
+  }
+
+  [data-theme="dark"] {
+    --color-bg: {{ config.style.color_bg_dark }};
+    --color-text: {{ config.style.color_text_dark }};
+    --color-text-muted: {{ config.style.color_text_muted_dark }};
+    --color-accent: {{ config.style.color_accent_dark }};
+    --color-link: {{ config.style.color_link_dark or config.style.color_accent_dark }};
+    --color-link-hover: {{ config.style.color_link_hover_dark or (config.style.color_link_dark or config.style.color_accent_dark) }};
+    --color-border: {{ config.style.color_border_dark }};
+    --color-code-bg: {{ config.style.color_code_bg_dark }};
+  }
+</style>
