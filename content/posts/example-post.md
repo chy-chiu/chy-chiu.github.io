@@ -2,6 +2,7 @@
 title: "Example Writing Post"
 subtitle: "A demonstration of the static site generator features"
 date: 2024-01-15
+post: true
 tags: [example, tutorial]
 draft: false
 toc: true
@@ -111,3 +112,4 @@ Ordered list:
 ## Conclusion
 
 This static site generator provides a powerful yet simple way to create academic and personal websites from markdown files. Check out the [[research]] page for more examples!
+

@@ -24,6 +24,7 @@ class Page:
     url: str
     section: str
     raw_content: str
+    is_post: Optional[bool] = None
     date: Optional[datetime] = None
     subtitle: Optional[str] = None
     description: Optional[str] = None
@@ -166,6 +167,7 @@ def load_page(path: str, section: str) -> Optional[Page]:
         url=url,
         section=section,
         raw_content=body,
+        is_post=(True if section == 'writing' else False if section == 'notes' else None),
         date=date,
         subtitle=frontmatter.get('subtitle'),
         description=frontmatter.get('description'),
@@ -178,6 +180,14 @@ def load_page(path: str, section: str) -> Optional[Page]:
         featured=bool(frontmatter.get('featured', False)),
         featured_order=int(frontmatter.get('featured_order', 0) or 0),
     )
+
+    # If the author explicitly set `post: true/false`, keep it on the Page for downstream use.
+    # We treat it as advisory metadata; the directory/loader determines the section.
+    if 'post' in frontmatter and section in {'writing', 'notes'}:
+        try:
+            page.is_post = bool(frontmatter['post'])
+        except Exception:
+            pass
 
     return page
 
@@ -262,42 +272,63 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
         if now_page:
             index.pages[now_page.slug] = now_page
 
-    # Load writing posts
-    writing_dir = os.path.join(content_dir, 'writing')
-    if os.path.exists(writing_dir):
-        for filename in sorted(os.listdir(writing_dir)):
-            if filename.endswith('.md'):
-                path = os.path.join(writing_dir, filename)
-                page = load_page(path, 'writing')
-                if page and (include_drafts or not page.draft):
-                    index.pages[page.slug] = page
-                    index.writing.append(page)
-                    # Index tags
-                    for tag in page.tags:
-                        if tag not in index.tags:
-                            index.tags[tag] = []
-                        index.tags[tag].append(page)
+    def add_post(page: Page):
+        # Avoid silently clobbering pages with the same slug.
+        if page.slug in index.pages:
+            logger.warning(
+                f"Duplicate slug '{page.slug}' from {page.url}; keeping first at {index.pages[page.slug].url}"
+            )
+            return
+        index.pages[page.slug] = page
 
-    # Sort writing by date descending
+        if page.section == 'writing':
+            index.writing.append(page)
+        elif page.section == 'notes':
+            index.notes.append(page)
+
+        for tag in page.tags:
+            index.tags.setdefault(tag, []).append(page)
+
+    def coerce_bool(value) -> Optional[bool]:
+        if isinstance(value, bool):
+            return value
+        if value is None:
+            return None
+        if isinstance(value, (int, float)):
+            return bool(value)
+        if isinstance(value, str):
+            v = value.strip().lower()
+            if v in {'true', 'yes', 'y', '1', 'post'}:
+                return True
+            if v in {'false', 'no', 'n', '0', 'note'}:
+                return False
+        return None
+
+    posts_dir = os.path.join(content_dir, 'posts')
+    # New unified posts folder: content/posts/*.md
+    for filename in sorted(os.listdir(posts_dir)):
+        if not filename.endswith('.md'):
+            continue
+        path = os.path.join(posts_dir, filename)
+        try:
+            raw = Path(path).read_text(encoding='utf-8')
+        except Exception as e:
+            raise ContentError(f"Failed to read {path}: {e}") from e
+
+        frontmatter, _body = parse_frontmatter(raw)
+        is_post = coerce_bool(frontmatter.get('post'))
+        if is_post is None:
+            logger.warning(f"Missing/invalid `post:` field in {path}; defaulting to post: true")
+            is_post = True
+        section = 'writing' if is_post else 'notes'
+
+        page = load_page(path, section)
+        if page and (include_drafts or not page.draft):
+            add_post(page)
+
+
+    # Sort by date descending
     index.writing.sort(key=lambda p: p.date if p.date else datetime.min, reverse=True)
-
-    # Load notes
-    notes_dir = os.path.join(content_dir, 'notes')
-    if os.path.exists(notes_dir):
-        for filename in sorted(os.listdir(notes_dir)):
-            if filename.endswith('.md'):
-                path = os.path.join(notes_dir, filename)
-                page = load_page(path, 'notes')
-                if page and (include_drafts or not page.draft):
-                    index.pages[page.slug] = page
-                    index.notes.append(page)
-                    # Index tags
-                    for tag in page.tags:
-                        if tag not in index.tags:
-                            index.tags[tag] = []
-                        index.tags[tag].append(page)
-
-    # Sort notes by date descending
     index.notes.sort(key=lambda p: p.date if p.date else datetime.min, reverse=True)
 
     # Load projects

@@ -33,8 +33,7 @@ pip install -r requirements.txt
 │   ├── research.md       # Research page
 │   ├── publications.bib  # BibTeX file
 │   ├── projects/         # Project markdown files
-│   ├── writing/          # Long-form writing
-│   └── notes/            # Short notes
+│   └── posts/            # Writing + notes (use frontmatter to split)
 ├── assets/               # Images and media
 │   └── images/
 ├── templates/            # Jinja2 templates
@@ -86,7 +85,7 @@ The generated site will be in the `output/` directory. Deploy to:
 
 Generated extras:
 
-- `output/rss.xml` (Writing-only RSS feed)
+- `output/rss.xml` (Writing-only RSS feed; items come from posts with `post: true`)
 - `output/sitemap.xml` and `output/robots.txt`
 - `output/404.html` (GitHub Pages-friendly)
 - `output/og/...` (auto-generated OpenGraph SVG images)
@@ -157,15 +156,16 @@ title: "Research"
 Research overview...
 ```
 
-### Writing & Notes
+### Writing & Notes (Unified `content/posts/`)
 
-Create markdown files in `content/writing/` or `content/notes/`:
+Create markdown files in `content/posts/` and use `post: true` for Writing and `post: false` for Notes:
 
 ```markdown
 ---
 title: "My Post Title"
 subtitle: "Optional subtitle"
 date: 2024-01-15
+post: true
 tags: [machine-learning, research]
 draft: false
 toc: true

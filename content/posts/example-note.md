@@ -1,6 +1,7 @@
 ---
 title: "Example Note"
 date: 2024-01-10
+post: false
 tags: [meta, example]
 draft: false
 ---
@@ -23,3 +24,4 @@ print("Notes support code too!")
 ```
 
 That's it! Keep notes short and focused on a single topic or idea.
+
