@@ -17,13 +17,14 @@ Build a Python-based static site generator that converts Obsidian-flavored markd
 Generate the following directory structure:
 
 ```
-generator/
+.
 ├── build.py                    # Main entry point, CLI
 ├── config.yaml                 # Site configuration
 ├── requirements.txt            # Python dependencies
 ├── README.md                   # Usage documentation
+├── serve.py                    # Optional: alternative dev server
 │
-├── generator/                        # Python package
+├── generator/                  # Python package
 │   ├── __init__.py
 │   ├── config.py               # Config loading and validation
 │   ├── content.py              # Content loading and parsing
@@ -34,37 +35,38 @@ generator/
 │   └── utils.py                # Slugify, file ops, logging
 │
 ├── content/                    # User content (example/scaffold)
+│   ├── home.md
 │   ├── about.md
+│   ├── now.md
 │   ├── research.md
 │   ├── publications.bib
-│   ├── projects/
-│   │   └── .gitkeep
-│   ├── writing/
-│   │   └── .gitkeep
-│   └── notes/
-│       └── .gitkeep
+│   ├── posts/                  # Unified writing + notes
+│   │   └── *.md
+│   └── projects/
+│       └── *.md
 │
 ├── assets/                     # User assets
-│   └── images/
-│       └── .gitkeep
+│   ├── images/
+│   │   └── ...
+│   └── font/
+│       └── ...                 # Optional local fonts
 │
 ├── templates/
 │   ├── base.html
-│   ├── page.html               # Generic static page (about, research)
+│   ├── home.html
+│   ├── page.html               # Generic static page (about, now)
 │   ├── research.html           # Research page with publications + projects
-│   ├── post_index.html         # List view for writing/notes
+│   ├── post_index.html         # List view for writing/notes (+ year archives)
 │   ├── post.html               # Individual post view
 │   ├── tag_index.html          # All tags listing
 │   ├── tag_page.html           # Single tag's posts
+│   ├── 404.html
 │   └── partials/
 │       ├── nav.html
 │       ├── head.html
 │       ├── footer.html
-│       ├── toc.html
-│       ├── post_card.html
 │       ├── project_card.html
-│       ├── publication.html
-│       └── citation_tooltip.html
+│       └── publication.html
 │
 ├── static/
 │   ├── css/
@@ -73,7 +75,7 @@ generator/
 │       └── theme.js
 │
 └── output/                     # Generated site (gitignored)
-    └── .gitkeep
+    └── ...
 ```
 
 ---
@@ -88,10 +90,16 @@ site:
   description: "Site description for meta tags"
   base_url: "https://username.github.io"  # No trailing slash
   author: "Author Name"
+  author_highlight: "Author Name"         # Optional; used for author list highlighting
+  links:                                   # Optional footer links
+    - label: "CV"
+      url: "/about/"
+    - label: "Email"
+      url: "mailto:you@example.com"
 
 nav:
   - label: "About"
-    url: "/"
+    url: "/about/"
   - label: "Research"
     url: "/research/"
   - label: "Writing"
@@ -99,29 +107,55 @@ nav:
   - label: "Notes"
     url: "/notes/"
 
+home:
+  recent_writing_count: 3
+  featured_writing: []          # Optional; list of post slugs
+  papers_count: 3
+  featured_publications: []     # Optional; list of BibTeX keys
+
+features:
+  reading_time: true            # Show reading time metadata on posts
+
 style:
-  # Fonts (loaded from Google Fonts)
-  font_body: "IBM Plex Sans"
-  font_mono: "IBM Plex Mono"
-  font_heading: "IBM Plex Sans"
+  # Nested schema (preferred). A legacy flat schema is also accepted.
+  fonts:
+    body: "Libre Baskerville"   # Google Font
+    mono: "IBM Plex Mono"       # Google Font
+    heading: "IBM Plex Sans"    # Google Font or local font in assets/font/
+    link: null                  # Optional; defaults to body
+    heading_weight: 400         # int | "normal" | "bold"
+  sizes:
+    root: "16px"                # html font-size
+    prose: "1.125rem"           # article text
+    headings:
+      h1: "2.25rem"
+      h2: "1.75rem"
+      h3: "1.375rem"
+      h4: "1.125rem"
+    titles:
+      page: "2.5rem"
+      post: "1.5rem"
+      home_h2: "1.5rem"
+      section_h2: "1.75rem"
+      bibliography_h2: "1.5rem"
+  colors:
+    light:
+      bg: "#ffffff"
+      text: "#1a1a1a"
+      text_muted: "#666666"
+      accent: "#0066cc"
+      border: "#e0e0e0"
+      code_bg: "#f5f5f5"
+      # link / link_hover optional; default to accent
+    dark:
+      bg: "#1a1a1a"
+      text: "#e0e0e0"
+      text_muted: "#999999"
+      accent: "#66b3ff"
+      border: "#333333"
+      code_bg: "#2d2d2d"
 
-  # Light mode colors
-  color_bg: "#ffffff"
-  color_text: "#1a1a1a"
-  color_text_muted: "#666666"
-  color_accent: "#0066cc"
-  color_border: "#e0e0e0"
-  color_code_bg: "#f5f5f5"
-
-  # Dark mode colors
-  color_bg_dark: "#1a1a1a"
-  color_text_dark: "#e0e0e0"
-  color_text_muted_dark: "#999999"
-  color_accent_dark: "#66b3ff"
-  color_border_dark: "#333333"
-  color_code_bg_dark: "#2d2d2d"
-
-math: true  # Whether to load MathJax
+math: true  # Whether to load MathJax for math notation
 ```
 
 ### config.py Implementation
@@ -136,25 +170,29 @@ math: true  # Whether to load MathJax
 
 ## Content Types
 
-### 1. Static Pages (about.md, research.md)
+### 1. Static Pages (home/about/research/now)
 
-**Location:** `content/about.md`, `content/research.md`
+**Location:** `content/home.md`, `content/about.md`, `content/research.md`, `content/now.md`
 
 **Frontmatter:**
 ```yaml
 ---
-title: "About"
+title: "Page Title"
+description: "Optional meta description"
+updated: 2024-01-15  # Optional (Now/About); YYYY-MM-DD
 ---
 ```
 
 **Behavior:**
-- `about.md` renders to `/index.html` (homepage)
-- `research.md` renders to `/research/index.html`
-- Research page additionally includes publications and project cards
+- `home.md` renders to `/index.html`
+- `about.md` renders to `/about/index.html`
+- `research.md` renders to `/research/index.html` and additionally includes publications + project cards
+- `now.md` renders to `/now/index.html`
+- Back-compat: if `content/home.md` is missing, `content/about.md` becomes the homepage (`/`)
 
-### 2. Writing Posts
+### 2. Writing Posts (in unified posts folder)
 
-**Location:** `content/writing/*.md`
+**Location:** `content/posts/*.md` with `post: true`
 
 **Frontmatter (required fields marked with *):**
 ```yaml
@@ -162,9 +200,12 @@ title: "About"
 title: "Post Title"*
 subtitle: "Optional subtitle"
 date: 2024-01-15*          # YYYY-MM-DD format
+post: true*                # true = Writing, false = Notes
 tags: [tag-one, tag-two]   # List of strings, optional
 draft: false               # Default: false
 toc: true                  # Default: false
+featured: false            # Optional; allows homepage pinning
+featured_order: 0          # Optional; smaller first
 ---
 ```
 
@@ -175,9 +216,9 @@ toc: true                  # Default: false
 - Listed on `/writing/index.html` sorted by date descending
 - Posts with `draft: true` excluded from build unless `--drafts` flag passed
 
-### 3. Notes
+### 3. Notes (in unified posts folder)
 
-**Location:** `content/notes/*.md`
+**Location:** `content/posts/*.md` with `post: false`
 
 **Frontmatter:** Same schema as Writing
 
@@ -1145,8 +1186,11 @@ python build.py --drafts
 # Clean output directory before build
 python build.py --clean
 
-# Development server with live reload (v1.1)
-python build.py --serve
+# Allow broken internal links/assets (default is strict)
+python build.py --no-strict
+
+# Serve output/ locally after building
+python build.py --serve --port 8000
 ```
 
 ### build.py Implementation
@@ -1154,23 +1198,23 @@ python build.py --serve
 ```python
 #!/usr/bin/env python3
 import argparse
-from ssg.builder import Builder
+from generator.builder import Builder
 
 def main():
     parser = argparse.ArgumentParser(description='Build static site')
     parser.add_argument('--drafts', action='store_true', help='Include draft posts')
     parser.add_argument('--clean', action='store_true', help='Clean output before build')
-    parser.add_argument('--serve', action='store_true', help='Start dev server')  # v1.1
+    parser.add_argument('--no-strict', action='store_true', help='Do not fail build on link-check problems')
+    parser.add_argument('--serve', action='store_true', help='Serve output/ locally after build')
+    parser.add_argument('--port', type=int, default=8000, help='Port for --serve')
     args = parser.parse_args()
 
     builder = Builder(
         include_drafts=args.drafts,
-        clean=args.clean
+        clean=args.clean,
+        strict=not args.no_strict,
     )
     builder.build()
-
-    if args.serve:
-        builder.serve()  # v1.1
 
 if __name__ == '__main__':
     main()
@@ -1180,13 +1224,13 @@ if __name__ == '__main__':
 
 ## Python Module Specifications
 
-### ssg/config.py
+### generator/config.py
 
 - `load_config(path: str) -> Config` — Load and validate config.yaml
 - `Config` dataclass with typed fields
 - Raise `ConfigError` with helpful message for missing/invalid fields
 
-### ssg/content.py
+### generator/content.py
 
 - `Page` dataclass: title, subtitle, date, tags, draft, toc, slug, url, raw_content, html_content, section
 - `Project` dataclass: title, description, image, links, order, content
@@ -1199,9 +1243,9 @@ if __name__ == '__main__':
   - `writing: list[Page]` — sorted by date
   - `notes: list[Page]` — sorted by date
   - `projects: list[Project]` — sorted by order
-  - `tags: dict[str, list[Page]]` — tag to pages mapping
+  - `tags: dict[str, list[Page]]` — tag to pages mapping (writing + notes)
 
-### ssg/markdown_ext.py
+### generator/markdown_ext.py
 
 - `MarkdownProcessor` class:
   - `__init__(page_registry: dict[str, Page], citation_registry: dict[str, Publication])`
@@ -1215,13 +1259,13 @@ if __name__ == '__main__':
   - `_post_process_figures(html: str) -> str`
   - `_extract_toc(html: str) -> tuple[str, str]` — returns (html_with_ids, toc_html)
 
-### ssg/citations.py
+### generator/citations.py
 
 - `load_bibtex(path: str) -> dict[str, Publication]`
 - `format_citation(pub: Publication) -> str` — formatted string for bibliography
 - `format_inline_citation(pub: Publication) -> str` — short form for tooltips
 
-### ssg/templates.py
+### generator/templates.py
 
 - `TemplateEngine` class:
   - `__init__(templates_dir: str, config: Config)`
@@ -1229,10 +1273,10 @@ if __name__ == '__main__':
   - Auto-includes config in all contexts
   - Custom Jinja2 filters: `slugify`, `date_format`
 
-### ssg/builder.py
+### generator/builder.py
 
 - `Builder` class:
-  - `__init__(include_drafts: bool = False, clean: bool = False)`
+  - `__init__(include_drafts: bool = False, clean: bool = False, strict: bool = True)`
   - `build()` — main orchestration method
   - `_load_all_content()`
   - `_process_all_markdown()`
@@ -1243,7 +1287,7 @@ if __name__ == '__main__':
   - `_copy_static_assets()`
   - `_write_file(path: str, content: str)`
 
-### ssg/utils.py
+### generator/utils.py
 
 - `slugify(text: str) -> str` — title to URL-safe slug
 - `ensure_dir(path: str)` — create directory if not exists
@@ -1257,21 +1301,37 @@ if __name__ == '__main__':
 
 ```
 output/
-├── index.html                    # About page
+├── index.html                    # Home page
+├── about/
+│   └── index.html
 ├── research/
 │   └── index.html
+├── now/
+│   └── index.html
+├── 404.html                      # GitHub Pages-friendly
+├── 404/
+│   └── index.html                # Trailing-slash-friendly
 ├── writing/
 │   ├── index.html                # Writing listing
+│   ├── {year}/
+│   │   └── index.html            # Writing year archive
 │   └── {slug}/
 │       └── index.html            # Individual posts
 ├── notes/
 │   ├── index.html
+│   ├── {year}/
+│   │   └── index.html            # Notes year archive
 │   └── {slug}/
 │       └── index.html
 ├── tags/
 │   ├── index.html                # All tags
 │   └── {tag-slug}/
 │       └── index.html            # Tag page
+├── rss.xml                       # Writing-only RSS feed
+├── sitemap.xml
+├── robots.txt
+├── og/
+│   └── ...                       # OpenGraph SVGs
 ├── assets/
 │   └── images/
 │       └── ...
@@ -1309,13 +1369,11 @@ output/
 - ✓ Table of contents
 
 ### v1.1 (Future)
-- In-text citations `[@key]`
 - Live reload dev server
-- RSS feed generation
+- Client-side search (MiniSearch) or build-time index
+- Backlinks support
 
 ### v1.2 (Future)
-- Client-side search
-- Backlinks support
 - Margin notes (Distill-style)
 
 # Decisions (captured)

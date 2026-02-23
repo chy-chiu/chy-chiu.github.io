@@ -5,6 +5,7 @@ Custom markdown transformations and processing
 import re
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional
+from urllib.parse import urlparse
 from markdown_it import MarkdownIt
 from mdit_py_plugins.front_matter import front_matter_plugin
 from mdit_py_plugins.footnote import footnote_plugin
@@ -18,6 +19,64 @@ from .utils import to_url_slug, get_logger
 
 
 logger = get_logger()
+
+_BARE_DOMAIN_RE = re.compile(
+    r"^(?P<host>(?:[a-z0-9-]+\.)+[a-z]{2,})(?P<rest>(?::\d+)?(?:[/?#].*)?)?$",
+    re.IGNORECASE,
+)
+
+
+def _normalize_link_href(href: str) -> str:
+    """
+    Convert bare domains like 'google.com' to 'https://google.com'.
+
+    Markdown treats 'google.com' as a relative URL; this makes it external by default.
+    """
+    if not href:
+        return href
+
+    href = href.strip()
+    if not href:
+        return href
+
+    if href.startswith(("/", "#", "./", "../")):
+        return href
+
+    parsed = urlparse(href)
+    if parsed.scheme:
+        return href
+
+    # Avoid rewriting likely relative paths (e.g., 'writing/my-post/').
+    if "/" in href and not _BARE_DOMAIN_RE.match(href):
+        return href
+
+    if _BARE_DOMAIN_RE.match(href):
+        return f"https://{href}"
+
+    return href
+
+
+def external_links_plugin(md: MarkdownIt) -> None:
+    """
+    Markdown-it-py core plugin: normalize hrefs for markdown links.
+    """
+
+    def normalize(state) -> bool:
+        for token in state.tokens:
+            if token.type != "inline":
+                continue
+            if not token.children:
+                continue
+            for child in token.children:
+                if child.type != "link_open":
+                    continue
+                href = child.attrGet("href") or ""
+                normalized = _normalize_link_href(href)
+                if normalized != href:
+                    child.attrSet("href", normalized)
+        return False
+
+    md.core.ruler.after("inline", "external_links", normalize)
 
 
 @dataclass
@@ -38,13 +97,14 @@ class MarkdownProcessor:
         Initialize markdown processor.
 
         Args:
-            page_registry: Dictionary mapping slugs to Page objects
+            page_registry: Dictionary mapping Obsidian-style link keys (usually filename stem slugs) to Page objects
             citation_registry: Dictionary mapping citation keys to Publication objects
         """
         self.page_registry = page_registry
         self.citation_registry = citation_registry
         self.md = MarkdownIt()
         self.md.enable(['table', 'strikethrough'])
+        self.md.use(external_links_plugin)
         self.citations_used = []  # Track citations in order of appearance
 
     def process(self, content: str, extract_toc: bool = False) -> ProcessedContent:
@@ -108,7 +168,9 @@ class MarkdownProcessor:
         def replace_link(match):
             page_title = match.group(1).strip()
             display_text = match.group(2).strip() if match.group(2) else page_title
-            slug = to_url_slug(page_title)
+            # Obsidian link targets may include heading or block refs, e.g. [[Note#Heading]] or [[Note^block]].
+            link_target = re.split(r'[#^]', page_title, maxsplit=1)[0].strip()
+            slug = to_url_slug(link_target)
 
             if slug in self.page_registry:
                 page = self.page_registry[slug]

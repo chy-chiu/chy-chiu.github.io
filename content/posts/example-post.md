@@ -101,15 +101,16 @@ Ordered list:
 
 ## Tables
 
-| Feature | Supported | Notes |
-|---------|-----------|-------|
-| Wiki links | ✅ | `\\[\\[page\\]\\]` syntax |
-| Callouts | ✅ | Obsidian-style |
-| Math | ✅ | MathJax |
-| Code | ✅ | Pygments highlighting |
-| Dark mode | ✅ | Automatic |
+| Feature    | Supported | Notes                     |
+| ---------- | --------- | ------------------------- |
+| Wiki links | ✅         | `\\[\\[page\\]\\]` syntax |
+| Callouts   | ✅         | Obsidian-style            |
+| Math       | ✅         | MathJax                   |
+| Code       | ✅         | Pygments highlighting     |
+| Dark mode  | ✅         | Automatic                 |
 
 ## Conclusion
 
 This static site generator provides a powerful yet simple way to create academic and personal websites from markdown files. Check out the [[research]] page for more examples!
 
+Can I reference [[example-post2]] here?? 

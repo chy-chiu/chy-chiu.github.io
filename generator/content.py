@@ -24,6 +24,8 @@ class Page:
     url: str
     section: str
     raw_content: str
+    source_path: str = ""
+    source_stem: str = ""
     is_post: Optional[bool] = None
     date: Optional[datetime] = None
     subtitle: Optional[str] = None
@@ -114,6 +116,8 @@ def load_page(path: str, section: str) -> Optional[Page]:
     # Parse fields
     title = frontmatter.get('title', Path(path).stem)
     slug = to_url_slug(title)
+    source_path = str(path)
+    source_stem = Path(path).stem
 
     # Determine URL based on section
     if section == 'home':
@@ -167,6 +171,8 @@ def load_page(path: str, section: str) -> Optional[Page]:
         url=url,
         section=section,
         raw_content=body,
+        source_path=source_path,
+        source_stem=source_stem,
         is_post=(True if section == 'writing' else False if section == 'notes' else None),
         date=date,
         subtitle=frontmatter.get('subtitle'),
@@ -190,6 +196,37 @@ def load_page(path: str, section: str) -> Optional[Page]:
             pass
 
     return page
+
+
+def build_page_registry(pages: Dict[str, Page]) -> Dict[str, Page]:
+    """
+    Build a registry for resolving Obsidian-style wikilinks.
+
+    Obsidian links target the underlying filename (stem), not the frontmatter title.
+    This registry maps a normalized (slugified) filename stem to the Page.
+
+    Fallbacks are added to preserve older links:
+    - slugified title
+    - page.slug (URL slug)
+    """
+    registry: Dict[str, Page] = {}
+
+    def add_key(key: str, page: Page) -> None:
+        if not key:
+            return
+        if key in registry and registry[key].url != page.url:
+            logger.warning(
+                f"Duplicate page registry key '{key}' for {page.url}; keeping first at {registry[key].url}"
+            )
+            return
+        registry.setdefault(key, page)
+
+    for page in pages.values():
+        add_key(to_url_slug(page.source_stem), page)
+        add_key(to_url_slug(page.title), page)
+        add_key(page.slug, page)
+
+    return registry
 
 
 def load_project(path: str) -> Optional[Project]:

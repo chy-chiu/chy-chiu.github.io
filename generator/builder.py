@@ -6,7 +6,7 @@ import os
 import shutil
 from pathlib import Path
 from .config import load_config, Config
-from .content import load_all_content, ContentIndex
+from .content import load_all_content, ContentIndex, build_page_registry
 from .citations import load_bibtex
 from .markdown_ext import MarkdownProcessor
 from .templates import TemplateEngine
@@ -66,7 +66,7 @@ class Builder:
 
         # Initialize markdown processor
         self.processor = MarkdownProcessor(
-            page_registry=self.content.pages,
+            page_registry=build_page_registry(self.content.pages),
             citation_registry=self.publications
         )
 
@@ -376,8 +376,29 @@ class Builder:
             f.write(content)
 
     def _render_404(self):
-        html = self.templates.render('404.html', current_url='/404/')
-        self._write_file('output/404.html', html)
+        page = {"title": "404", "description": "Page not found"}
+        has_research = any(p.section == "research" for p in self.content.pages.values())
+        has_tags = bool(self.content.tags)
+
+        # Trailing-slash canonical page (for hosts that serve directory indexes)
+        html_slash = self.templates.render(
+            '404.html',
+            current_url='/404/',
+            page=page,
+            has_research=has_research,
+            has_tags=has_tags,
+        )
+        self._write_file('output/404/index.html', html_slash)
+
+        # GitHub Pages uses `/404.html` specifically.
+        html_file = self.templates.render(
+            '404.html',
+            current_url='/404.html',
+            page=page,
+            has_research=has_research,
+            has_tags=has_tags,
+        )
+        self._write_file('output/404.html', html_file)
 
     def _iter_site_urls(self):
         yield '/'
