@@ -18,6 +18,30 @@ import sys
 from generator.builder import Builder
 
 
+class _NotFoundTo404Handler(http.server.SimpleHTTPRequestHandler):
+    """
+    Dev-server handler that serves the site's generated 404.html for missing routes.
+
+    This matches GitHub Pages behavior more closely than the default handler.
+    """
+
+    def send_error(self, code, message=None, explain=None):
+        if code != 404:
+            return super().send_error(code, message, explain)
+
+        try:
+            with open("404.html", "rb") as f:
+                body = f.read()
+        except OSError:
+            return super().send_error(code, message, explain)
+
+        self.send_response(404, message)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Build static site from markdown content'
@@ -50,27 +74,21 @@ def main():
     )
     args = parser.parse_args()
 
-    try:
-        builder = Builder(
-            include_drafts=args.drafts,
-            clean=args.clean,
-            strict=not args.no_strict,
-        )
-        builder.build()
 
-        if args.serve:
-            if not os.path.exists('output'):
-                raise RuntimeError("output/ directory missing after build")
-            os.chdir('output')
-            handler = http.server.SimpleHTTPRequestHandler
-            with socketserver.TCPServer(("", args.port), handler) as httpd:
-                print(f"Serving at http://localhost:{args.port}/ (Ctrl+C to stop)")
-                httpd.serve_forever()
+    builder = Builder(
+        include_drafts=args.drafts,
+        clean=args.clean,
+        strict=not args.no_strict,
+    )
+    builder.build()
 
-        return 0
-    except Exception as e:
-        print(f"\nBuild failed: {e}", file=sys.stderr)
-        return 1
+    if args.serve:
+        if not os.path.exists('output'):
+            raise RuntimeError("output/ directory missing after build")
+        os.chdir('output')
+        with socketserver.TCPServer(("", args.port), _NotFoundTo404Handler) as httpd:
+            print(f"Serving at http://localhost:{args.port}/ (Ctrl+C to stop)")
+            httpd.serve_forever()
 
 
 if __name__ == '__main__':

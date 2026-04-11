@@ -11,14 +11,13 @@ class TestExternalLinks(unittest.TestCase):
 
     def test_relative_links_are_unchanged(self):
         mp = MarkdownProcessor(page_registry={}, citation_registry={})
-        out = mp.process("[Writing](/writing/)")
-        self.assertIn('href="/writing/"', out.html)
+        out = mp.process("[Blog](/blog/)")
+        self.assertIn('href="/blog/"', out.html)
 
-        out2 = mp.process("[Post](writing/my-post/)")
-        self.assertIn('href="writing/my-post/"', out2.html)
+        out2 = mp.process("[Post](blog/my-post/)")
+        self.assertIn('href="blog/my-post/"', out2.html)
 
     def test_schemed_links_are_unchanged(self):
         mp = MarkdownProcessor(page_registry={}, citation_registry={})
         out = mp.process("[x](http://example.com)")
         self.assertIn('href="http://example.com"', out.html)
-

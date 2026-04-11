@@ -3,8 +3,17 @@
 {% block content %}
 <div class="post-index">
   <header class="section-header">
-    <h1>{{ section_title }}</h1>
+    <h1>{% if page and page.title %}{{ page.title }}{% else %}{{ section_title }}{% endif %}</h1>
+    {% if page and page.updated %}
+    <p class="page-updated">Last updated {{ page.updated | date_format("%Y-%m-%d") }}</p>
+    {% endif %}
   </header>
+
+  {% if page and page.html_content %}
+  <div class="page-content prose">
+    {{ page.html_content | safe }}
+  </div>
+  {% endif %}
 
   <ul class="post-list">
     {% for post in posts %}

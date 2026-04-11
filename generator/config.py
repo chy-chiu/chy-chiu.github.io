@@ -43,6 +43,12 @@ class FeatureConfig:
 
 
 @dataclass
+class AttachmentsConfig:
+    source_dir: str = "content/posts/assets"
+    url_prefix: str = "/assets/posts/assets/"
+
+
+@dataclass
 class StyleConfig:
     font_body: str = "Libre Baskerville"
     font_mono: str = "IBM Plex Mono"
@@ -89,6 +95,7 @@ class Config:
     math: bool = True
     home: HomeConfig = field(default_factory=HomeConfig)
     features: FeatureConfig = field(default_factory=FeatureConfig)
+    attachments: AttachmentsConfig = field(default_factory=AttachmentsConfig)
 
 
 def _coalesce(*values):
@@ -282,4 +289,20 @@ def load_config(path: str = "config.yaml") -> Config:
     # Parse feature flags
     features = FeatureConfig(**(data.get('features', {}) or {}))
 
-    return Config(site=site, nav=nav, style=style, math=math, home=home, features=features)
+    # Parse attachments config
+    attachments_data = data.get('attachments', {}) or {}
+    attachments = AttachmentsConfig(
+        source_dir=str(attachments_data.get("source_dir", AttachmentsConfig.source_dir)),
+        url_prefix=str(attachments_data.get("url_prefix", AttachmentsConfig.url_prefix)),
+    )
+
+    if not attachments.url_prefix.startswith("/"):
+        raise ConfigError("attachments.url_prefix must start with '/' (e.g. '/assets/posts/assets/').")
+    if "://" in attachments.url_prefix:
+        raise ConfigError("attachments.url_prefix must be a path, not a full URL (e.g. '/assets/posts/assets/').")
+    if ".." in attachments.url_prefix:
+        raise ConfigError("attachments.url_prefix must not contain '..'.")
+    if not attachments.url_prefix.endswith("/"):
+        attachments.url_prefix = attachments.url_prefix + "/"
+
+    return Config(site=site, nav=nav, style=style, math=math, home=home, features=features, attachments=attachments)

@@ -1,12 +1,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>{% if page %}{{ page.title }} | {% endif %}{{ config.site.title }}</title>
+{% set page_header = none %}
+{% if page and page.title %}
+  {% set page_header = page.title %}
+{% elif post and post.title %}
+  {% set page_header = post.title %}
+{% elif section_title %}
+  {% set page_header = section_title %}
+{% elif tag %}
+  {% set page_header = 'Tagged: ' ~ tag %}
+{% endif %}
+
+<title>{% if current_url == '/' %}Chris Chiu | Mind Machine Medicine{% elif page_header %}{{ page_header }} | Chris Chiu{% else %}Chris Chiu{% endif %}</title>
 <meta name="description" content="{% if page and page.description %}{{ page.description }}{% elif page and page.subtitle %}{{ page.subtitle }}{% else %}{{ config.site.description }}{% endif %}">
 <meta name="author" content="{{ config.site.author }}">
 
 <!-- Open Graph tags -->
-<meta property="og:title" content="{% if page %}{{ page.title }}{% else %}{{ config.site.title }}{% endif %}">
+<meta property="og:title" content="{% if current_url == '/' %}Chris Chiu | Mind Machine Medicine{% elif page_header %}{{ page_header }} | Chris Chiu{% else %}Chris Chiu{% endif %}">
 <meta property="og:description" content="{% if page and page.description %}{{ page.description }}{% elif page and page.subtitle %}{{ page.subtitle }}{% else %}{{ config.site.description }}{% endif %}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ config.site.base_url }}{{ current_url }}">

@@ -4,7 +4,7 @@ subtitle: "A demonstration of the static site generator features"
 date: 2024-01-15
 post: true
 tags: [example, tutorial]
-draft: false
+draft: true
 toc: true
 ---
 

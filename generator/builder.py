@@ -10,7 +10,7 @@ from .content import load_all_content, ContentIndex, build_page_registry
 from .citations import load_bibtex
 from .markdown_ext import MarkdownProcessor
 from .templates import TemplateEngine
-from .utils import ensure_dir, get_logger
+from .utils import ensure_dir, get_logger, copy_tree_merge
 
 
 logger = get_logger()
@@ -54,7 +54,7 @@ class Builder:
         logger.info("Loading content...")
         self.content = load_all_content(include_drafts=self.include_drafts)
         logger.info(f"Loaded {len(self.content.pages)} pages, "
-                   f"{len(self.content.writing)} writing posts, "
+                   f"{len(self.content.writing)} blog posts, "
                    f"{len(self.content.notes)} notes, "
                    f"{len(self.content.projects)} projects")
 
@@ -67,7 +67,8 @@ class Builder:
         # Initialize markdown processor
         self.processor = MarkdownProcessor(
             page_registry=build_page_registry(self.content.pages),
-            citation_registry=self.publications
+            citation_registry=self.publications,
+            attachments_url_prefix=self.config.attachments.url_prefix,
         )
 
         # Initialize template engine
@@ -80,7 +81,7 @@ class Builder:
         # Render pages
         logger.info("Rendering pages...")
         self._render_static_pages()
-        self._render_writing()
+        self._render_blog()
         self._render_notes()
         self._render_tags()
         self._render_archives()
@@ -100,7 +101,7 @@ class Builder:
         logger.info("Build complete!")
 
     def _og_url_for(self, section: str, slug: str | None = None) -> str:
-        if section in {"writing", "notes"} and slug:
+        if section in {"blog", "notes"} and slug:
             return f"/og/{section}/{slug}.svg"
         return f"/og/{section}.svg"
 
@@ -109,7 +110,8 @@ class Builder:
         for page in self.content.pages.values():
             processed = self.processor.process(
                 page.raw_content,
-                extract_toc=page.toc
+                extract_toc=page.toc,
+                section=page.section,
             )
             page.html_content = processed.html
             page.toc_html = processed.toc_html
@@ -226,31 +228,35 @@ class Builder:
             self._write_file('output/now/index.html', html)
             logger.info("Rendered now page")
 
-    def _render_writing(self):
-        """Render writing section pages."""
-        # Render writing index
+    def _render_blog(self):
+        """Render blog section pages (formerly writing)."""
+
+        blog_page = next((p for p in self.content.pages.values() if p.section == "blog"), None)
+
+        # Render blog index
         html = self.templates.render(
             'post_index.html',
-            section_title='Writing',
+            section_title='Blog',
             posts=self.content.writing,
-            og_image_url=self._og_url_for("writing"),
-            current_url='/writing/'
+            page=blog_page,
+            og_image_url=self._og_url_for("blog"),
+            current_url='/blog/'
         )
-        self._write_file('output/writing/index.html', html)
-        logger.info(f"Rendered writing index")
+        self._write_file('output/blog/index.html', html)
+        logger.info("Rendered blog index")
 
-        # Render individual writing posts
+        # Render individual blog posts
         for post in self.content.writing:
             html = self.templates.render(
                 'post.html',
                 post=post,
                 toc_html=post.toc_html,
-                og_image_url=self._og_url_for("writing", post.slug),
+                og_image_url=self._og_url_for("blog", post.slug),
                 current_url=post.url
             )
             self._write_file(f'output{post.url}index.html', html)
 
-        logger.info(f"Rendered {len(self.content.writing)} writing posts")
+        logger.info(f"Rendered {len(self.content.writing)} blog posts")
 
     def _render_notes(self):
         """Render notes section pages."""
@@ -293,12 +299,12 @@ class Builder:
         for year, posts in writing_by_year.items():
             html = self.templates.render(
                 'post_index.html',
-                section_title=f'Writing: {year}',
+                section_title=f'Blog: {year}',
                 posts=posts,
-                og_image_url=self._og_url_for("writing"),
-                current_url=f'/writing/{year}/'
+                og_image_url=self._og_url_for("blog"),
+                current_url=f'/blog/{year}/'
             )
-            self._write_file(f'output/writing/{year}/index.html', html)
+            self._write_file(f'output/blog/{year}/index.html', html)
 
         notes_by_year = group_by_year(self.content.notes)
         for year, posts in notes_by_year.items():
@@ -363,6 +369,18 @@ class Builder:
                 shutil.rmtree(dst)
             shutil.copytree('assets', dst)
 
+        # Copy Obsidian attachment embeds (e.g. content/posts/assets) into the URL prefix folder.
+        attachments_src = (self.config.attachments.source_dir or "").strip()
+        attachments_prefix = (self.config.attachments.url_prefix or "").strip()
+        if attachments_src and attachments_prefix and os.path.exists(attachments_src):
+            rel = attachments_prefix.lstrip("/")
+            dst = os.path.join("output", rel)
+            copy_tree_merge(attachments_src, dst)
+        elif attachments_src and attachments_prefix and self.strict:
+            logger.warning(
+                f"Attachments source_dir not found; skipping: {attachments_src}"
+            )
+
     def _write_file(self, path: str, content: str):
         """
         Write content to file, creating directories as needed.
@@ -408,9 +426,9 @@ class Builder:
             yield '/now/'
         if any(p.section == 'research' for p in self.content.pages.values()):
             yield '/research/'
-        yield '/writing/'
+        yield '/blog/'
         for year in sorted({p.date.year for p in self.content.writing if p.date}, reverse=True):
-            yield f'/writing/{year}/'
+            yield f'/blog/{year}/'
         for post in self.content.writing:
             yield post.url
         yield '/notes/'
@@ -488,8 +506,8 @@ class Builder:
 </svg>"""
 
         pages_by_section = {p.section: p for p in self.content.pages.values()}
-        for section in ("home", "about", "now", "research", "writing", "notes", "tags"):
-            if section in {"writing", "notes"}:
+        for section in ("home", "about", "now", "research", "blog", "notes", "tags"):
+            if section in {"blog", "notes"}:
                 continue
             title = self.config.site.title if section == "home" else section.capitalize()
             subtitle = self.config.site.description
@@ -499,7 +517,7 @@ class Builder:
             self._write_file(f"output/og/{section}.svg", svg(title, subtitle))
 
         for post in self.content.writing:
-            self._write_file(f"output/og/writing/{post.slug}.svg", svg(post.title, post.subtitle or self.config.site.description))
+            self._write_file(f"output/og/blog/{post.slug}.svg", svg(post.title, post.subtitle or self.config.site.description))
 
         for note in self.content.notes:
             self._write_file(f"output/og/notes/{note.slug}.svg", svg(note.title, note.subtitle or self.config.site.description))

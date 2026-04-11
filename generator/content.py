@@ -108,13 +108,14 @@ def load_page(path: str, section: str) -> Optional[Page]:
 
     # Validate required fields for posts
     if section in ['writing', 'notes']:
-        if 'title' not in frontmatter:
-            raise ContentError(f"Missing required field 'title' in {path}")
         if 'date' not in frontmatter:
             raise ContentError(f"Missing required field 'date' in {path}")
 
     # Parse fields
-    title = frontmatter.get('title', Path(path).stem)
+    raw_title = frontmatter.get('title')
+    if isinstance(raw_title, str):
+        raw_title = raw_title.strip()
+    title = raw_title or Path(path).stem
     slug = to_url_slug(title)
     source_path = str(path)
     source_stem = Path(path).stem
@@ -128,6 +129,10 @@ def load_page(path: str, section: str) -> Optional[Page]:
         url = '/research/'
     elif section == 'now':
         url = '/now/'
+    elif section == 'blog':
+        url = '/blog/'
+    elif section == 'writing':
+        url = f'/blog/{slug}/'
     else:
         url = f'/{section}/{slug}/'
 
@@ -309,6 +314,12 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
         if now_page:
             index.pages[now_page.slug] = now_page
 
+    blog_path = os.path.join(content_dir, 'blog.md')
+    if os.path.exists(blog_path):
+        blog_page = load_page(blog_path, 'blog')
+        if blog_page:
+            index.pages[blog_page.slug] = blog_page
+
     def add_post(page: Page):
         # Avoid silently clobbering pages with the same slug.
         if page.slug in index.pages:
@@ -323,8 +334,9 @@ def load_all_content(content_dir: str = 'content', include_drafts: bool = False)
         elif page.section == 'notes':
             index.notes.append(page)
 
-        for tag in page.tags:
-            index.tags.setdefault(tag, []).append(page)
+        if page.tags:
+            for tag in page.tags:
+                index.tags.setdefault(tag, []).append(page)
 
     def coerce_bool(value) -> Optional[bool]:
         if isinstance(value, bool):

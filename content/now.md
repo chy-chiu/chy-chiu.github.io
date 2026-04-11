@@ -9,7 +9,7 @@ What I’m focused on right now.
 ## 2026-02-04
 
 - Shipping a cleaner homepage + static site pipeline
-- Writing: draft queue + outlining next posts
+- Blog: draft queue + outlining next posts
 
 ## 2026-01-10
 

@@ -33,6 +33,22 @@ def copy_tree(src: str, dst: str) -> None:
     shutil.copytree(src, dst)
 
 
+def copy_tree_merge(src: str, dst: str) -> None:
+    """
+    Recursively copy directory tree into an existing destination.
+
+    Files in `src` overwrite files at the same relative path in `dst`.
+    """
+    for root, dirs, files in os.walk(src):
+        rel_root = os.path.relpath(root, src)
+        out_root = dst if rel_root == "." else os.path.join(dst, rel_root)
+        ensure_dir(out_root)
+        for d in dirs:
+            ensure_dir(os.path.join(out_root, d))
+        for f in files:
+            shutil.copy2(os.path.join(root, f), os.path.join(out_root, f))
+
+
 def get_logger() -> logging.Logger:
     """Get configured logger."""
     logger = logging.getLogger('ssg')

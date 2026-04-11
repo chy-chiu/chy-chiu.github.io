@@ -12,7 +12,7 @@
 
   {% if featured_writing %}
   <section class="home-section">
-    <h2>Featured Writing</h2>
+    <h2>Featured Blog</h2>
     <ul class="post-list">
       {% for post in featured_writing %}
       <li class="post-item">
@@ -37,7 +37,7 @@
 
   {% if recent_writing %}
   <section class="home-section">
-    <h2>Recent Writing</h2>
+    <h2>Recent Posts</h2>
     <ul class="post-list home-recent-list">
       {% for post in recent_writing %}
       <li class="post-item">
@@ -54,11 +54,11 @@
       </li>
       {% endfor %}
     </ul>
-    <p><a href="/writing/">All writing →</a></p>
+    <p><a href="/blog/">All posts →</a></p>
   </section>
   {% endif %}
 
-  {% if publications %}
+  <!-- {% if publications %}
   <section class="home-section publications-section home-publications">
     <h2>{{ publications_title }}</h2>
     <ul class="pub-list">
@@ -68,6 +68,6 @@
     </ul>
     <p><a href="/research/">Research →</a></p>
   </section>
-  {% endif %}
+  {% endif %} -->
 </article>
 {% endblock %}

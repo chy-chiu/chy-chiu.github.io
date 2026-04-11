@@ -3,7 +3,7 @@ title: "Example Note"
 date: 2024-01-10
 post: false
 tags: [meta, example]
-draft: false
+draft: true
 ---
 
 # Quick Note

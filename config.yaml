@@ -19,12 +19,12 @@ site:
 nav:
   - label: "About"
     url: "/about/"
-  - label: "Research"
-    url: "/research/"
-  - label: "Writing"
-    url: "/writing/"
-  - label: "Notes"
-    url: "/notes/"
+  # - label: "Research"
+  #   url: "/research/"
+  - label: "Blog"
+    url: "/blog/"
+  # - label: "Notes"
+  #   url: "/notes/"
 
 home:
   recent_writing_count: 3
@@ -80,3 +80,8 @@ style:
       code_bg: "#1C1B1A"           # old darkMode.lightgray
 
 math: true  # Whether to load MathJax for mathematical notation
+
+# Obsidian attachment embeds: `![[Pasted-image.png]]`
+attachments:
+  source_dir: "content/posts/assets"
+  url_prefix: "/assets/posts/assets/"

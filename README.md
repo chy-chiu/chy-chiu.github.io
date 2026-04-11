@@ -33,7 +33,7 @@ pip install -r requirements.txt
 │   ├── research.md       # Research page
 │   ├── publications.bib  # BibTeX file
 │   ├── projects/         # Project markdown files
-│   └── posts/            # Writing + notes (use frontmatter to split)
+│   └── posts/            # Blog + notes (use frontmatter to split)
 ├── assets/               # Images and media
 │   └── images/
 ├── templates/            # Jinja2 templates
@@ -85,11 +85,11 @@ The generated site will be in the `output/` directory. Deploy to:
 
 Generated extras:
 
-- `output/rss.xml` (Writing-only RSS feed; items come from posts with `post: true`)
+- `output/rss.xml` (Blog-only RSS feed; items come from posts with `post: true`)
 - `output/sitemap.xml` and `output/robots.txt`
 - `output/404.html` (GitHub Pages-friendly)
 - `output/og/...` (auto-generated OpenGraph SVG images)
-- Year archives: `/writing/YYYY/` and `/notes/YYYY/`
+- Year archives: `/blog/YYYY/` and `/notes/YYYY/`
 
 ## Content Guide
 
@@ -125,9 +125,13 @@ updated: 2026-02-04
 What you’re focused on right now...
 ```
 
-### Featured Writing (Homepage)
+**Blog Index Intro** (`content/blog.md`, optional):
 
-Mark a Writing post as featured:
+If present, this markdown renders above the blog post list at `/blog/`.
+
+### Featured Blog (Homepage)
+
+Mark a Blog post as featured:
 
 ```yaml
 featured: true
@@ -156,9 +160,9 @@ title: "Research"
 Research overview...
 ```
 
-### Writing & Notes (Unified `content/posts/`)
+### Blog & Notes (Unified `content/posts/`)
 
-Create markdown files in `content/posts/` and use `post: true` for Writing and `post: false` for Notes:
+Create markdown files in `content/posts/` and use `post: true` for Blog and `post: false` for Notes:
 
 ```markdown
 ---
@@ -294,7 +298,7 @@ python -m unittest discover -s tests
 - ✅ Code highlighting, MathJax
 - ✅ Dark mode toggle
 - ✅ Publications list
-- ✅ RSS feed (Writing)
+- ✅ RSS feed (Blog)
 - ✅ sitemap.xml + robots.txt + 404
 
 ### v1.1 (Planned)

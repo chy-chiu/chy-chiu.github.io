@@ -5,6 +5,7 @@ Custom markdown transformations and processing
 import re
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional
+from urllib.parse import quote
 from urllib.parse import urlparse
 from markdown_it import MarkdownIt
 from mdit_py_plugins.front_matter import front_matter_plugin
@@ -92,28 +93,41 @@ class ProcessedContent:
 
 
 class MarkdownProcessor:
-    def __init__(self, page_registry: Dict[str, Page], citation_registry: Dict[str, Publication]):
+    def __init__(
+        self,
+        page_registry: Dict[str, Page],
+        citation_registry: Dict[str, Publication],
+        attachments_url_prefix: str = "/assets/posts/assets/",
+    ):
         """
         Initialize markdown processor.
 
         Args:
             page_registry: Dictionary mapping Obsidian-style link keys (usually filename stem slugs) to Page objects
             citation_registry: Dictionary mapping citation keys to Publication objects
+            attachments_url_prefix: Base URL prefix for Obsidian attachment embeds (e.g. '/assets/posts/assets/').
         """
         self.page_registry = page_registry
         self.citation_registry = citation_registry
+        self.attachments_url_prefix = attachments_url_prefix if attachments_url_prefix.endswith("/") else (attachments_url_prefix + "/")
         self.md = MarkdownIt()
         self.md.enable(['table', 'strikethrough'])
         self.md.use(external_links_plugin)
         self.citations_used = []  # Track citations in order of appearance
 
-    def process(self, content: str, extract_toc: bool = False) -> ProcessedContent:
+    def process(
+        self,
+        content: str,
+        extract_toc: bool = False,
+        section: str | None = None,
+    ) -> ProcessedContent:
         """
         Process markdown content through full pipeline.
 
         Args:
             content: Raw markdown content
             extract_toc: Whether to extract table of contents
+            section: Optional section name for asset resolution (e.g. 'writing', 'notes').
 
         Returns:
             ProcessedContent with HTML and optional TOC/bibliography
@@ -122,6 +136,9 @@ class MarkdownProcessor:
 
         # Reset citations for this document
         self.citations_used = []
+
+        # Transform Obsidian embeds (![[...]]), before wiki link handling.
+        content = self._transform_obsidian_embeds(content)
 
         # Transform wiki links
         content, wiki_warnings = self._transform_wiki_links(content)
@@ -135,7 +152,7 @@ class MarkdownProcessor:
 
         # Post-process HTML
         html = self._post_process_callouts(html)
-        html = self._post_process_figures(html)
+        html = self._post_process_figures(html, in_posts_section=(section in {"writing", "notes"}))
         html = self._post_process_code_blocks(html)
 
         # Extract TOC if requested
@@ -154,6 +171,78 @@ class MarkdownProcessor:
             bibliography_html=bibliography_html,
             warnings=warnings
         )
+
+    def _transform_obsidian_embeds(self, content: str) -> str:
+        """
+        Transform Obsidian embeds like `![[Pasted-image.png]]` to standard markdown images.
+
+        Supports:
+        - `![[file.png]]`
+        - `![[file.png|Caption]]`
+        - `![[file.png]](Caption)`
+        """
+        pattern = r'!\[\[([^\]|]+)(?:\|([^\]]+))?\]\](?:\(([^)]+)\))?'
+
+        def is_size_alias(value: str) -> bool:
+            v = (value or "").strip().lower()
+            if not v:
+                return False
+            if v.isdigit():
+                return True
+            if re.fullmatch(r"\d+\s*x\s*\d+", v):
+                return True
+            if re.fullmatch(r"\d+px", v):
+                return True
+            return False
+
+        def encode_path(path: str) -> str:
+            return "/".join(quote(seg) for seg in path.split("/"))
+
+        def resolve_post_asset_url(path: str) -> str:
+            p = (path or "").strip().lstrip("/")
+            if p.startswith("./"):
+                p = p[2:]
+            if p.startswith("assets/"):
+                p = p[len("assets/") :]
+            prefix = self.attachments_url_prefix
+            if not prefix.startswith("/"):
+                prefix = "/" + prefix
+            if not prefix.endswith("/"):
+                prefix += "/"
+            return prefix + encode_path(p)
+
+        def replace_embed(match):
+            raw_target = match.group(1).strip()
+            alias = match.group(2).strip() if match.group(2) else ""
+            trailing_caption = match.group(3).strip() if match.group(3) else ""
+
+            # Strip Obsidian heading/block refs if present.
+            target = re.split(r'[#^]', raw_target, maxsplit=1)[0].strip()
+            if not target:
+                return match.group(0)
+
+            lower = target.lower()
+            is_image = lower.endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".avif"))
+
+            alt_text = ""
+            if trailing_caption:
+                alt_text = trailing_caption
+            elif alias and not is_size_alias(alias):
+                alt_text = alias
+            else:
+                # Default alt to filename stem; avoid noisy extensions.
+                alt_text = re.sub(r"\.[a-z0-9]+$", "", target, flags=re.IGNORECASE)
+
+            if target.startswith(("http://", "https://", "/")):
+                url = target
+            else:
+                url = resolve_post_asset_url(target)
+
+            if is_image:
+                return f'![{alt_text}]({url})'
+            return f'[{alt_text or target}]({url})'
+
+        return re.sub(pattern, replace_embed, content)
 
     def _transform_wiki_links(self, content: str) -> Tuple[str, List[str]]:
         """
@@ -283,16 +372,35 @@ class MarkdownProcessor:
 
         return str(soup)
 
-    def _post_process_figures(self, html: str) -> str:
+    def _post_process_figures(self, html: str, in_posts_section: bool) -> str:
         """
         Wrap images in figure elements with figcaption.
         """
         soup = BeautifulSoup(html, 'html.parser')
 
+        def encode_path(path: str) -> str:
+            return "/".join(quote(seg) for seg in path.split("/"))
+
+        def resolve_post_asset_url(path: str) -> str:
+            p = (path or "").strip().lstrip("/")
+            if p.startswith("./"):
+                p = p[2:]
+            if p.startswith("assets/"):
+                p = p[len("assets/") :]
+            return f"{self.attachments_url_prefix}{encode_path(p)}"
+
         for img in soup.find_all('img'):
             # Skip if already in a figure
             if img.parent.name == 'figure':
                 continue
+
+            parent = img.parent
+            only_img_in_p = False
+            if parent and parent.name == "p":
+                only_img_in_p = all(
+                    (getattr(child, "name", None) == "img") or (str(child).strip() == "")
+                    for child in parent.contents
+                )
 
             alt_text = img.get('alt', '')
             figure_variant = None
@@ -305,7 +413,10 @@ class MarkdownProcessor:
             # Resolve image path
             src = img.get('src', '')
             if not src.startswith('/') and not src.startswith('http'):
-                src = f'/assets/images/{src}'
+                if in_posts_section:
+                    src = resolve_post_asset_url(src)
+                else:
+                    src = f'/assets/images/{encode_path(src)}'
             img['src'] = src
             img['loading'] = 'lazy'
 
@@ -319,20 +430,17 @@ class MarkdownProcessor:
             figcaption = soup.new_tag('figcaption')
             figcaption.string = alt_text
 
-            # Move img into figure
-            img_copy = img.extract()
-            figure.append(img_copy)
-            if alt_text:
-                figure.append(figcaption)
-
-            # Replace original img location with figure
-            # Find parent paragraph and replace it
-            parent = img.parent if hasattr(img, 'parent') else None
-            if parent and parent.name == 'p':
+            if only_img_in_p and parent:
+                img.extract()
+                figure.append(img)
+                if alt_text:
+                    figure.append(figcaption)
                 parent.replace_with(figure)
             else:
-                # If not in a paragraph, just insert figure
+                img.replace_with(figure)
                 figure.append(img)
+                if alt_text:
+                    figure.append(figcaption)
 
         return str(soup)
 
