@@ -8,7 +8,7 @@ draft: false
 toc: false
 ---
 Pink Floyd is one of my favourite bands. If I only have 10 uses of time travel, one of them would be to transport myself to their [1974 Dark Side of the Moon concert at Wembley.](https://www.youtube.com/watch?v=wG7xzB0Jp4U)
-![[Pasted image 20260411012942.png]](Seriously, who else is pretentious enough to do a concert for the lost souls of Pompei??)
+![[assets/Pasted image 20260411012942.png]](Seriously, who else is pretentious enough to do a concert for the lost souls of Pompei??)
 
 Born 20 years too late for the PC revolution or to catch the tail end of the band before they broke up, I went to a show by a [tribute band at Cambridge](https://www.ukpinkfloydexperience.com) instead last night.
 
