@@ -5,6 +5,7 @@ Main build orchestration
 import os
 import shutil
 from pathlib import Path
+from urllib.parse import unquote
 from .config import load_config, Config
 from .content import load_all_content, ContentIndex, build_page_registry
 from .citations import load_bibtex
@@ -33,10 +34,12 @@ class Builder:
         self.publications = {}
         self.processor: MarkdownProcessor = None
         self.templates: TemplateEngine = None
+        self.generated_html_files: set[str] = set()
 
     def build(self):
         """Main build orchestration method."""
         logger.info("Starting build...")
+        self.generated_html_files = set()
 
         # Load configuration
         self.config = load_config()
@@ -392,6 +395,8 @@ class Builder:
         ensure_dir(os.path.dirname(path))
         with open(path, 'w', encoding='utf-8') as f:
             f.write(content)
+        if path.endswith(".html"):
+            self.generated_html_files.add(os.path.normpath(path))
 
     def _render_404(self):
         page = {"title": "404", "description": "Page not found"}
@@ -530,7 +535,7 @@ class Builder:
 
         def normalize(path: str) -> str:
             path = path.split('#', 1)[0].split('?', 1)[0]
-            return path
+            return unquote(path)
 
         def output_path_for_url(url_path: str) -> str:
             if url_path == '/':
@@ -543,11 +548,14 @@ class Builder:
                 return os.path.join('output', url_path, 'index.html')
             return os.path.join('output', url_path)
 
-        html_files = []
-        for root, _dirs, files in os.walk('output'):
-            for f in files:
-                if f.endswith('.html'):
-                    html_files.append(os.path.join(root, f))
+        # Check links in pages generated in this build only.
+        # This avoids false failures from stale HTML left in output/ from previous runs.
+        html_files = sorted(self.generated_html_files)
+        if not html_files:
+            for root, _dirs, files in os.walk('output'):
+                for f in files:
+                    if f.endswith('.html'):
+                        html_files.append(os.path.join(root, f))
 
         problems = []
         for path in sorted(html_files):
