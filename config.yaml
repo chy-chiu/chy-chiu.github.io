@@ -84,4 +84,4 @@ math: true  # Whether to load MathJax for mathematical notation
 # Obsidian attachment embeds: `![[Pasted-image.png]]`
 attachments:
   source_dir: "content/posts/assets"
-  url_prefix: "/assets/posts/assets/"
+  url_prefix: "/assets/"
