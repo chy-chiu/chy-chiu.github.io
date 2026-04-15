@@ -9,6 +9,8 @@ toc: false
 ---
 
 
+I have been thinking lately, why am I so obsessed withe the possibility of uploading a brain / mind? 
+
 In the end, everybody just wants to leave a legacy
 
 Why mind upload is potentially useful for society 
@@ -19,5 +21,9 @@ Why Artificial Societies when you have true societies?
 
 # the humanistic viewpoint
 
+There are 8 billion of us
 # the computational theory viewpoint
 Minimize information loss within a complex system
+
+## the personal reason
+let's be honest I just want to look at the memes of 2500 

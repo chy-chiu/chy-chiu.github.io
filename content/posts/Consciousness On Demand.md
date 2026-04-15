@@ -6,7 +6,7 @@ post: true
 tags:
   - mind
   - machine
-draft: false
+draft: true
 toc: false
 ---
 

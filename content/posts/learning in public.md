@@ -12,7 +12,7 @@ Tonnes of people have written about learning in public. Here are my thoughts on 
 
 Pros:
 - You are forced to organize your thoughts and write properly - it's a good exercise to get better at writing
-- Demonstration of domain expertise to people who you might want to impress in the future
+- Demonstration of ? domain expertise to people who you might want to impress in the future
 
 Cons: 
 - If nobody reads what you write, you are sad

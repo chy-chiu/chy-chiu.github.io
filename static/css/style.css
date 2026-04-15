@@ -199,6 +199,8 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .nav-links a {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
   color: var(--color-text);
   text-decoration: none;
   font-weight: 500;
@@ -291,11 +293,13 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .theme-icon::before {
-  content: "☀️";
+  content: "☀";
+  color: var(--color-text);
 }
 
 [data-theme="dark"] .theme-icon::before {
-  content: "🌙";
+  content: "☽";
+  color: var(--color-text);
 }
 
 
