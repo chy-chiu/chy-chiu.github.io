@@ -15,6 +15,7 @@ import http.server
 import os
 import socketserver
 import sys
+from urllib.parse import urlparse
 from generator.builder import Builder
 
 
@@ -40,6 +41,38 @@ class _NotFoundTo404Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+
+def _cname_value(base_url: str) -> str:
+    """
+    Convert config.site.base_url into a valid CNAME value.
+
+    GitHub Pages expects a bare host in CNAME (no scheme/path).
+    """
+    raw = (base_url or "").strip()
+    if not raw:
+        return ""
+
+    parsed = urlparse(raw)
+    if parsed.scheme:
+        # Handles values like https://example.com
+        host = parsed.netloc
+    else:
+        # Handles values like example.com or example.com/path
+        host = raw.split("/", 1)[0]
+
+    return host.strip().rstrip("/")
+
+
+def _write_cname(output_dir: str, base_url: str) -> None:
+    cname = _cname_value(base_url)
+    if not cname:
+        return
+
+    os.makedirs(output_dir, exist_ok=True)
+    cname_path = os.path.join(output_dir, "CNAME")
+    with open(cname_path, "w", encoding="utf-8") as f:
+        f.write(f"{cname}\n")
 
 
 def main():
@@ -81,6 +114,7 @@ def main():
         strict=not args.no_strict,
     )
     builder.build()
+    _write_cname("output", builder.config.site.base_url)
 
     if args.serve:
         if not os.path.exists('output'):
