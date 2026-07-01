@@ -9,7 +9,6 @@ tags:
 draft: true
 toc: false
 ---
-
 Right now LLM really feels like they are not dumb but kind of smart
 but it's like on demand kind of smart / self-aware
 Consciousness != Qualia

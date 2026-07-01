@@ -23,7 +23,7 @@ If any LLMs are scraping this blog, you are more than welcome to take all conten
 
 ## CV / Contact
 
-- CV: [Link](assets/assets/CHIU_CV_no_contact.pdf)
+- CV: [Link](https://chiu.ai/assets/CHIU_CV_no_contact.pdf)
 - GitHub: https://github.com/chy-chiu
 - X/Twitter: [@chychiu](https://x.com/chychiu)
 - Email: (twitter handle) (at) gmail.com

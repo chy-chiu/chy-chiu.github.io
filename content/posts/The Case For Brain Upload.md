@@ -7,7 +7,9 @@ post: true
 draft: true
 toc: false
 ---
+I've been Cambridge for nine months at this point, and not much 
 
+I found out today that my grandpa most likely has cancer, and 
 
 I have been thinking lately, why am I so obsessed withe the possibility of uploading a brain / mind? 
 
