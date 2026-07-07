@@ -185,8 +185,13 @@ h1, h2, h3, h4, h5, h6{
   white-space: nowrap;
 }
 
-/* Right-side group: links + theme toggle */
 .nav-menu {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.nav-actions {
   display: flex;
   align-items: center;
   gap: var(--space-md);
@@ -247,6 +252,10 @@ h1, h2, h3, h4, h5, h6{
     display: block;
   }
 
+  .nav {
+    position: relative;
+  }
+
   .nav-menu {
     display: none;
     flex-direction: column;
@@ -258,6 +267,7 @@ h1, h2, h3, h4, h5, h6{
     padding: var(--space-md);
     gap: var(--space-md);
     border-bottom: 1px solid var(--color-border);
+    margin-left: 0;
   }
 
   .nav-menu.open {
@@ -269,8 +279,9 @@ h1, h2, h3, h4, h5, h6{
     gap: var(--space-md);
   }
 
-  .header {
-    position: relative;
+  .nav-actions {
+    margin-left: auto;
+    gap: var(--space-sm);
   }
 }
 

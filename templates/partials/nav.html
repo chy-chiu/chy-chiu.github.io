@@ -1,9 +1,6 @@
 <header class="header">
   <nav class="nav">
     <a href="/" class="nav-logo">{{ config.site.title }}</a>
-    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
-      <span class="nav-toggle-icon"></span>
-    </button>
     <div class="nav-menu" id="nav-links">
       <ul class="nav-links">
         {% for item in config.nav %}
@@ -14,6 +11,11 @@
         </li>
         {% endfor %}
       </ul>
+    </div>
+    <div class="nav-actions">
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+        <span class="nav-toggle-icon"></span>
+      </button>
       <button class="theme-toggle" aria-label="Toggle dark mode">
         <span class="theme-icon"></span>
       </button>
