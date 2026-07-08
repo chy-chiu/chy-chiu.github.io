@@ -8,7 +8,7 @@ draft: false
 toc: false
 ---
 
-If you ask me what my super long-term life goal / interest / objecetive function is, it will be that "I want to work on brain upload technology". I've been incessantly harassing people as to why I think it should be a thing / my motivation for it, and I thought i would write a blog post about it. Think of it as a manifesto of sorts, and hopefully it won't be used against me in the future ([unabomber](https://en.wikipedia.org/wiki/Industrial_Society_and_Its_Future) as meme)
+If you ask me what my super long-term life goal / interest / objecetive function is, it will be that "I want to work on brain upload technology". I've been incessantly harassing people as to why I think it should be a thing / my motivation for it, and I thought i would write a blog post about it. Think of it as a manifesto of sorts, and hopefully [it won't be used against me in the future](https://en.wikipedia.org/wiki/Ted_Kaczynski#After_publication).
 
 ## How do you even define an uploaded brain / mind anyways?
 
@@ -20,7 +20,7 @@ I think I spam the word "brain upload" a lot, but a more concrete definition wou
 
 If you've watched [Pantheon](https://en.wikipedia.org/wiki/Pantheon_\(TV_series\)), a mental model is the Uploaded Intelligence (UI) in the show. For those who haven't watched it, TLDR humanity all now live on the cloud as AI agents that occasionally zoom down to robots in the physical realm, but otherwise they all just hang out in the virtual space and continue to live as digital entities.
 
-This might sound super cooked, and I acknowledge that it is a bit on the left field, but it is a shared vision by a large group of others including Jensen Huang (https://www.youtube.com/watch?v=vif8NQcjVf0&t=8570)
+This might sound super cooked, and I acknowledge that it is a bit on the left field, but it is a shared vision by a large group of others including [Jensen Huang](https://www.youtube.com/watch?v=vif8NQcjVf0&t=8570)
 
 ![[Pasted image 20260708214913.png]](narrow: if it walks like a duck, and talks like a duck, who cares if the duck is made out of meat or GPUs?)
 
@@ -60,13 +60,13 @@ Any other higher order meaning to our existence, in my opinion, are just stories
 
 Another argument I have with others is that "oh but you are not uploading, you are just [prestiging](https://en.wikipedia.org/wiki/The_Prestige_\(film\))". To that, I argue that continuity of consciousness is itself an _illusion_. It's one of those things that has been argued to death in the realm of philosophy. My best mental model is from this game called [Soma](https://en.wikipedia.org/wiki/Soma_\(video_game\)) **(Spoilers Ahead)** At the end of the game, the main character was promised to be transported to some digital heaven, but instead it was actually a copy and upload scenario. We, as the players, were then shown two versions - the one that got left behind and the one that got to be "uploaded". The former ended up in abject horror, while the latter lived in blissful ignorance, with the illusion of continuity.
 
-Medically, where consciousness goes is during anaesthesia is also one of those ongoing academic debates, but it is mostly accepted* that it is a discontinuous process, i.e. a fresh reboot of hardware, which occasionally leads to buggy software, such as delirium or personality changes (https://www.sciencedirect.com/science/article/abs/pii/S0301008216301137), dissociative identity (https://www.sciencedirect.com/science/article/abs/pii/S0301008216301137), or even long-term issues with identity and memory up to two months (https://psychiatryonline.org/doi/10.1176/appi.ajp.2013.12121632). All these suggest that establishing a coherent mind is a fiddly process where continuity is only post-hoc, and overall brittle and unstable.
+Medically, where consciousness goes is during anaesthesia is also one of those ongoing academic debates, but it is mostly accepted* that it is a discontinuous process, i.e. a fresh reboot of hardware, which occasionally leads to buggy software, such as [delirium or personality changes](https://www.sciencedirect.com/science/article/abs/pii/S0301008216301137), [dissociative identity](https://pmc.ncbi.nlm.nih.gov/articles/PMC10443949/), or even [long-term issues with self-recognition and memory up to two months](https://psychiatryonline.org/doi/10.1176/appi.ajp.2013.12121632). All these suggest that establishing a coherent mind is a fiddly process where continuity is only post-hoc, and overall brittle and unstable.
 
 With that in mind, it is probably worth wondering also whether an uploaded mind with sufficient fidelity is even possible, or if we run into fundamental limitations such as the embodied mind, in which case we might need to simulate not just the mind / brain, but also the whole body including its gut microbiome and all the other small niggly stuff. That is an open question, but it's worth exploring.
 
 ## So now what?
-To be honest, nothing much. I think the tech is not there yet. I think before it becomes an engineering problem, it is first and foremost a cultural problem, that most people don't think similar to the above. The majority of humanity still believes there is a god, and amongst the tech crowd, I wonder what the split looks like re willingness re brain upload (which is why I am doing a vote at ICML, and why you might be reading this now). 
+To be honest, nothing much. I think the tech is not there yet, and before it becomes an engineering problem, it is first and foremost a cultural problem, that most people don't think similar to the above. The majority of humanity still believes there is a god, and amongst the tech crowd, I wonder what the split looks like re willingness re brain upload (which is why I am doing a vote at ICML, and why you might be reading this now). 
 
 Personally, I am not doing much either. As of now my PhD project is just on agents (ew), but I am thinking about this problem a lot, and would gladly discuss / argue about this anytime. 
 
-Lastly, I don't track visitor count to my personal site or anything. If you find what I wrote above remotely interesting, I would appreciate a follow @chychiu (or feel free to DM me there to tell me why I am wrong)
+Lastly, I don't track visitor count to my personal site or anything. If you find what I wrote above remotely interesting, I would appreciate a follow [@chychiu](https://x.com/chychiu) (or feel free to DM me there to tell me why I am wrong)
