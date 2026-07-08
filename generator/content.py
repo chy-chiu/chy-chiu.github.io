@@ -3,6 +3,7 @@ Content loading and parsing
 """
 
 import os
+import re
 import yaml
 from dataclasses import dataclass, field
 from datetime import datetime, date as date_type
@@ -87,6 +88,35 @@ def parse_frontmatter(content: str) -> tuple[Dict, str]:
         return {}, content
 
 
+def normalize_internal_url(url_value: object, path: str) -> str:
+    """Normalize a frontmatter URL override to a clean relative path segment."""
+    if not isinstance(url_value, str):
+        raise ContentError(f"Invalid 'url' in {path}: expected a string")
+
+    url = url_value.strip()
+    if not url:
+        raise ContentError(f"Invalid 'url' in {path}: value cannot be empty")
+    if "://" in url or url.startswith("//"):
+        raise ContentError(f"Invalid 'url' in {path}: expected a site-relative path")
+
+    url = url.strip("/")
+    url = re.sub(r"/{2,}", "/", url)
+
+    if url.endswith("/index.html"):
+        url = url[: -len("/index.html")]
+    if not url:
+        raise ContentError(f"Invalid 'url' in {path}: value cannot be empty")
+    if url.startswith(("blog/", "notes/")):
+        url = url.split("/", 1)[1]
+    return url
+
+
+def has_url_override(frontmatter: Dict) -> bool:
+    """Return True only when frontmatter url is a non-empty string."""
+    url_value = frontmatter.get('url')
+    return isinstance(url_value, str) and bool(url_value.strip())
+
+
 def load_page(path: str, section: str) -> Optional[Page]:
     """
     Load a markdown page from file.
@@ -120,8 +150,12 @@ def load_page(path: str, section: str) -> Optional[Page]:
     source_path = str(path)
     source_stem = Path(path).stem
 
-    # Determine URL based on section
-    if section == 'home':
+    # Determine URL based on section, with frontmatter override for posts/notes.
+    if section in {'writing', 'notes'} and has_url_override(frontmatter):
+        custom_path = normalize_internal_url(frontmatter['url'], path)
+        section_root = 'blog' if section == 'writing' else 'notes'
+        url = f'/{section_root}/{custom_path}/'
+    elif section == 'home':
         url = '/'
     elif section == 'about':
         url = '/about/'

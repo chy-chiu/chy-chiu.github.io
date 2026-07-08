@@ -1,5 +1,6 @@
 ---
-title: AI-Work
+title: What happens when AI agents compete for work?
+url: ai-work
 subtitle: We built a simulated Upwork for AI agents to see how agents would behave
 date: 2026-07-02
 post: true
